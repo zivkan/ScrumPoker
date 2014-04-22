@@ -14,9 +14,19 @@ scrumPokerApp.config([
     }
 ]);
 
-var scrumPokerControllers = angular.module('scrumPokerControllers', []);
+var scrumPokerControllers = angular.module('scrumPokerControllers', ['SignalR']);
 
-scrumPokerControllers.controller('lobby', ['$scope', '$http', function ($scope, $http) {
+scrumPokerControllers.controller('lobby', ['$scope', '$rootScope', 'Hub', function ($scope, $rootScope, Hub) {
     $scope.rooms = [];
+    $scope.messages = [];
+    $scope.hub = new Hub('lobbyHub', {
+        'newMessage': function(message) {
+            //if (message != null) {
+                $scope.messages.push(message);
+                $rootScope.$apply();
+            //}
+        }
+    },['click']);
+
 }]);
 scrumPokerControllers.controller('room', ['$scope', function($scope) {}]);
