@@ -14,9 +14,9 @@ scrumPokerApp.config([
     }
 ]);
 
-var scrumPokerControllers = angular.module('scrumPokerControllers', ['SignalR']);
+var scrumPokerControllers = angular.module('scrumPokerControllers', []);
 
-scrumPokerControllers.controller('lobby', ['$scope', 'Hub', function ($scope, Hub) {
+scrumPokerControllers.controller('lobby', ['$scope', function ($scope) {
     $scope.rooms = [];
     $scope.messages = [];
 
