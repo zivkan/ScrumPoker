@@ -1,33 +1,37 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
 using Microsoft.AspNet.SignalR;
+using System;
+using System.Collections.Generic;
 
 namespace ScrumPoker.Hubs
 {
     public class LobbyHub : Hub
     {
-        // This hub has no inbound API. It is used only for client notifications.
+        private static readonly Lazy<IDictionary<int, Room>> Rooms = new Lazy<IDictionary<int,Room>>(()=> new Dictionary<int, Room>());
+        private static readonly Lazy<Random> Rand = new Lazy<Random>(()=>new Random());
 
-        public void click()
+        public ICollection<Room> GetRooms()
         {
-            Clients.All.newMessage("clicked: " + Context.ConnectionId);
+            return Rooms.Value.Values;
         }
 
-        public override Task OnConnected()
+        public string addRoom(string name)
         {
-            Clients.All.newMessage("connection: " + Context.ConnectionId);
-            return base.OnConnected();
-        }
+            if (string.IsNullOrEmpty(name))
+                return "Must provide a name for the room";
 
-        public override Task OnDisconnected()
-        {
-            Clients.All.newMessage("disconnection: " + Context.ConnectionId);
-            return base.OnDisconnected();
-        }
+            var lowerName = name.ToLower();
+            if (Rooms.Value.Values.Any(r => r.Name.ToLower() == lowerName))
+                return "Room with that name already exists";
 
-        public override Task OnReconnected()
-        {
-            Clients.All.newMessage("reconnection: " + Context.ConnectionId);
-            return base.OnReconnected();
+            var id = Convert.ToUInt16(Rand.Value.Next(ushort.MinValue, ushort.MaxValue));
+            while (Rooms.Value.ContainsKey(id)) // woohoo! infinite loop!
+                id = Convert.ToUInt16(Rand.Value.Next(ushort.MinValue, ushort.MaxValue));
+
+            var room = new Room {Id = id, Name = name};
+            Rooms.Value.Add(id, room);
+            Clients.All.roomAdded(room);
+            return "";
         }
 
     }
