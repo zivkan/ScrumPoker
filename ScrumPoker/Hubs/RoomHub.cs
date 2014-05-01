@@ -23,43 +23,50 @@ namespace ScrumPoker.Hubs
             SendMessage(string.Format("User '{0}' has joined", displayName));
         }
 
-        public void SendMessage(string message)
+        public void LeaveRoom()
         {
-            var roomId = _lobby.ConnectedUsersRoom[Context.ConnectionId];
-
-            foreach(var p in _lobby.Rooms[roomId].Participants)
+            ushort? roomId = null;
+            if (_lobby.ConnectedUsersRoom.ContainsKey(Context.ConnectionId))
             {
-                Clients.Client(p.ConnectionId).roomMessage("message = " + message);
-            }
-        }
-
-        public override Task OnConnected()
-        {
-            var connectionId = Context.ConnectionId;
-            if (_lobby.ConnectedUsersRoom.ContainsKey(connectionId))
-            {
-                var roomId = _lobby.ConnectedUsersRoom[connectionId];
+                roomId = _lobby.ConnectedUsersRoom[Context.ConnectionId];
+                _lobby.ConnectedUsersRoom.Remove(Context.ConnectionId);
             }
 
-            return base.OnConnected();
+            if (roomId != null)
+            {
+                var room = _lobby.Rooms[roomId.Value];
+                var participant = room.Participants.FirstOrDefault(x => x.ConnectionId == Context.ConnectionId);
+                if (participant != null)
+                {
+                    room.Participants.Remove(participant);
+                    SendMessage(room, participant.Name + " has left the building");
+                }
+            }
+
         }
 
         public override Task OnDisconnected()
         {
-            if (_lobby.ConnectedUsersRoom.ContainsKey(Context.ConnectionId))
-            {
-                var roomId = _lobby.ConnectedUsersRoom[Context.ConnectionId];
-                if (_lobby.Rooms.ContainsKey(roomId))
-                {
-                    var room = _lobby.Rooms[roomId];
-                    var participant = room.Participants.FirstOrDefault(x => x.ConnectionId == Context.ConnectionId);
-                    if (participant != null)
-                        room.Participants.Remove(participant);
-                }
-                _lobby.ConnectedUsersRoom.Remove(Context.ConnectionId);
-            }
+            LeaveRoom();
 
             return base.OnDisconnected();
         }
+
+        public void SendMessage(string message)
+        {
+            var roomId = _lobby.ConnectedUsersRoom[Context.ConnectionId];
+
+            SendMessage(_lobby.Rooms[roomId], message);
+        }
+
+        private void SendMessage(Room room, string message)
+        {
+            foreach (var p in room.Participants)
+            {
+                Clients.Client(p.ConnectionId).roomMessage("message = " + message);
+            }
+            
+        }
+
     }
 }

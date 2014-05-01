@@ -81,6 +81,15 @@ scrumPokerApp.factory('PokerServer', [
             room.server.sendMessage(message);
         }
 
+        $rootScope.$on('$locationChangeStart', function (event, newUrl, oldUrl) {
+            if (oldUrl.indexOf('/room/') != -1) {
+                if (PokerServer.currentRoom != null) {
+                    room.server.leaveRoom();
+                    PokerServer.currentRoom = null;
+                }
+            }
+        });
+
         return PokerServer;
     }
 ]);
