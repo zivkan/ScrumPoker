@@ -1,18 +1,22 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace ScrumPoker.Hubs
 {
     public class Room
     {
-        public int Id;
-        public string Name;
-        public bool FlaggedForDeletion;
-        public IList<object> Participants;
+        public ushort Id { get; private set; }
+        public string Name { get; private set; }
 
-        public Room()
+        public IList<string> Participants { get; private set; }
+
+        public bool WasEmptyLastInterval { get; set; }
+
+        public Room(ushort id, string name)
         {
-            Participants = new List<object>();
+            Id = id;
+            Name = name;
+            Participants = new List<string>();
+            WasEmptyLastInterval = false;
         }
     }
 }

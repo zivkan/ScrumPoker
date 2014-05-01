@@ -1,4 +1,4 @@
-﻿var scrumPokerApp = angular.module('scrumPokerApp', ['ngRoute', 'scrumPokerControllers']);
+﻿var scrumPokerApp = angular.module('scrumPokerApp', ['ngRoute', 'ui.bootstrap', 'scrumPokerControllers']);
 
 scrumPokerApp.config([
     '$routeProvider', function ($routeProvider) {
@@ -17,17 +17,43 @@ scrumPokerApp.config([
 var scrumPokerControllers = angular.module('scrumPokerControllers', []);
 
 scrumPokerControllers.controller('lobby', ['$scope', function ($scope) {
-    $scope.rooms = [];
-    $scope.messages = [];
+    $scope.rooms = null;
 
     $scope.hub = $.connection.lobbyHub;
 
-    $scope.hub.client.newMessage = function(message) {
-        $scope.messages.push(message);
+    $scope.hub.client.roomAdded = function(room) {
+        $scope.rooms.push(room);
         $scope.$apply();
     };
+    $scope.hub.client.roomDeleted = function (roomId) {
+        var getRoomIndex = function(roomId) {
+            for (var i = 0; i < $scope.rooms.length; i++) {
+                if ($scope.rooms[i].Id == roomId) {
+                    return i;
+                }
+            }
+            return -1;
+        }
+        var roomIndex = getRoomIndex(roomId);
+        if (roomIndex != -1) {
+            $scope.rooms.splice(roomIndex, 1);
+            $scope.$apply();
+        }
+    }
 
-    $.connection.hub.start();
+    $.connection.hub.start().done(function() {
+        $scope.hub.server.getRooms().done(function (rooms) {
+                $scope.rooms = rooms;
+            $scope.$apply();
+        });
+    });
+
+    $scope.addRoomButton = function(name) {
+        $scope.hub.server.addRoom(name).done(function(result) {
+            var r = result;
+        });
+    }
 
 }]);
+
 scrumPokerControllers.controller('room', ['$scope', function ($scope) { }]);

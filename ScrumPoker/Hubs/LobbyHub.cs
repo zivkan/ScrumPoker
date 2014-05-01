@@ -1,34 +1,32 @@
-﻿using System.Threading.Tasks;
-using Microsoft.AspNet.SignalR;
+﻿using Microsoft.AspNet.SignalR;
+using System.Collections.Generic;
 
 namespace ScrumPoker.Hubs
 {
     public class LobbyHub : Hub
     {
-        // This hub has no inbound API. It is used only for client notifications.
+        private readonly Lobby _lobby;
 
-        public void click()
+        public LobbyHub(Lobby lobby)
         {
-            Clients.All.newMessage("clicked: " + Context.ConnectionId);
+            _lobby = lobby;
         }
 
-        public override Task OnConnected()
+        public IEnumerable<RoomInfo> GetRooms()
         {
-            Clients.All.newMessage("connection: " + Context.ConnectionId);
-            return base.OnConnected();
+            return _lobby.GetAllPublicRooms();
         }
 
-        public override Task OnDisconnected()
+        public string AddRoom(string name)
         {
-            Clients.All.newMessage("disconnection: " + Context.ConnectionId);
-            return base.OnDisconnected();
-        }
+            RoomInfo room;
 
-        public override Task OnReconnected()
-        {
-            Clients.All.newMessage("reconnection: " + Context.ConnectionId);
-            return base.OnReconnected();
-        }
+            var message = _lobby.CreateRoom(name, out room);
 
+            if (room != null)
+                Clients.All.RoomAdded(room);
+
+            return message;
+        }
     }
 }
