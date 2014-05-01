@@ -18,7 +18,7 @@ namespace ScrumPoker.Hubs
         {
             _rooms = new ConcurrentDictionary<ushort, Room>();
             _rand = new Random();
-            _timer = new Timer(5*1000) {Enabled = false, AutoReset = true};
+            _timer = new Timer(30*1000) {Enabled = false, AutoReset = true};
             _timer.Elapsed += TimerOnElapsed;
             _hub = hub;
         }
