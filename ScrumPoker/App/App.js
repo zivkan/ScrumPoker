@@ -70,7 +70,7 @@ scrumPokerApp.factory('PokerServer', [
         PokerServer.JoinRoom = function(roomId, userName) {
             room.server.joinRoom(roomId, userName).done(function (result) {
                 PokerServer.currentRoom = { id: roomId, name: 'later' };
-                if ($location.path.indexOf('/room/') == -1) {
+                if ($location.$$path.indexOf('/room/') == -1) {
                     $location.path('/room/' + roomId);
                 }
                 $rootScope.$apply();

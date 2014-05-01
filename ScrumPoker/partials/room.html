@@ -2,7 +2,7 @@
     <div class="panel-heading">Door to room</div>
     <div class="panel-body">
         Name <input type="text" ng-model="myName"/><br/>
-        <input type="button" value="Join" ng-click="server.JoinRoom()"/>
+        <input type="button" value="Join" ng-click="server.JoinRoom(roomId, myName)"/>
     </div>
 </div>
 <div ng-show="server.currentRoom != null">
