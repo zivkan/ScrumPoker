@@ -1,1 +1,14 @@
-﻿<div>This is a room</div>
+﻿<div ng-show="server.currentRoom == null" class="panel panel-default">
+    <div class="panel-heading">Door to room</div>
+    <div class="panel-body">
+        Name <input type="text" ng-model="myName"/><br/>
+        <input type="button" value="Join" ng-click="server.JoinRoom()"/>
+    </div>
+</div>
+<div ng-show="server.currentRoom != null">
+    <div>
+        <input type="text" ng-model="someMessage"/><br/>
+        <input type="button" value="Send Message" ng-click="server.SendRoomMessage(someMessage)"/>
+    </div>
+    <div>{{server}}</div>
+</div>

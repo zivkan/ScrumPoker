@@ -6,7 +6,7 @@ scrumPokerApp.config([
             templateUrl: 'partials/lobby.html',
             controller: 'lobby'
         }).
-            when('/room/:room', {
+            when('/room/:roomId', {
                 templateUrl: 'partials/room.html',
                 controller: 'room'
             }).
@@ -15,10 +15,11 @@ scrumPokerApp.config([
 ]);
 
 scrumPokerApp.factory('PokerServer', [
-    '$rootScope', function($rootScope) {
+    '$rootScope', '$location', function ($rootScope, $location) {
         var PokerServer = this;
 
         PokerServer.rooms = null;
+        PokerServer.roomMessages = [];
 
         var lobby = $.connection.lobbyHub;
 
@@ -43,6 +44,12 @@ scrumPokerApp.factory('PokerServer', [
             }
         }
 
+        var room = $.connection.roomHub;
+        room.client.roomMessage = function (message) {
+            PokerServer.roomMessages.push(message);
+            $rootScope.$apply();
+        }
+
         $.connection.hub.start().done(function () {
             lobby.server.getRooms().done(function (rooms) {
                 PokerServer.rooms = rooms;
@@ -50,10 +57,18 @@ scrumPokerApp.factory('PokerServer', [
             });
         });
 
-        PokerServer.CreateRoom = function (name) {
-            lobby.server.addRoom(name).done(function (result) {
-                var r = result;
+        PokerServer.CreateRoom = function (roomName, userName) {
+            lobby.server.createRoom(roomName, userName).done(function (result) {
+                if (result.roomId != null) {
+                    PokerServer.currentRoom = { id: result.roomId, name: roomName };
+                    $location.path('/room/' + result.roomId);
+                    $rootScope.$apply();
+                }
             });
+        }
+
+        PokerServer.SendRoomMessage = function(message) {
+            room.server.sendMessage(message);
         }
 
         return PokerServer;
@@ -62,9 +77,15 @@ scrumPokerApp.factory('PokerServer', [
 
 var scrumPokerControllers = angular.module('scrumPokerControllers', []);
 
-scrumPokerControllers.controller('lobby', ['$scope', 'PokerServer', function ($scope, server) {
-    $scope.server = server;
+scrumPokerControllers.controller('lobby', [
+    '$scope', 'PokerServer', function ($scope, server) {
+        $scope.server = server;
+    }
+]);
 
-}]);
-
-scrumPokerControllers.controller('room', ['$scope', function ($scope) { }]);
+scrumPokerControllers.controller('room', [
+    '$scope', 'PokerServer', '$routeParams', function($scope, server, $routeParams) {
+        $scope.server = server;
+        $scope.roomId = $routeParams.roomId;
+    }
+]);
