@@ -25,15 +25,25 @@ scrumPokerControllers.controller('lobby', ['$scope', function ($scope) {
         $scope.rooms.push(room);
         $scope.$apply();
     };
+    $scope.hub.client.roomDeleted = function (roomId) {
+        var getRoomIndex = function(roomId) {
+            for (var i = 0; i < $scope.rooms.length; i++) {
+                if ($scope.rooms[i].Id == roomId) {
+                    return i;
+                }
+            }
+            return -1;
+        }
+        var roomIndex = getRoomIndex(roomId);
+        if (roomIndex != -1) {
+            $scope.rooms.splice(roomIndex, 1);
+            $scope.$apply();
+        }
+    }
 
     $.connection.hub.start().done(function() {
-        var result = $scope.hub.server.getRooms().done(function (rooms) {
-            //if (rooms != null) {
+        $scope.hub.server.getRooms().done(function (rooms) {
                 $scope.rooms = rooms;
-            //    rooms.forEach(function(room) {
-            //        $scope.rooms.push(room);
-            //    });
-            //}
             $scope.$apply();
         });
     });

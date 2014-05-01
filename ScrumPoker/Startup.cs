@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNet.SignalR;
+﻿using System;
+using Microsoft.AspNet.SignalR;
 using Microsoft.AspNet.SignalR.Hubs;
 using Microsoft.Owin;
+using Microsoft.Owin.Security.Provider;
 using Owin;
 using ScrumPoker.Hubs;
 using SimpleInjector;
@@ -11,7 +13,7 @@ namespace ScrumPoker
 {
     public class Startup
     {
-        public class MyHubActivator : IHubActivator
+        private class MyHubActivator : IHubActivator
         {
             private readonly Container _container;
 
@@ -35,7 +37,7 @@ namespace ScrumPoker
         private Container ConfigureDependancyInjector()
         {
             var container = new Container();
-            container.RegisterSingle<Lobby>();
+            container.RegisterSingle<Lobby>(()=>new Lobby(GlobalHost.ConnectionManager.GetHubContext<LobbyHub>()));
             return container;
         }
     }
