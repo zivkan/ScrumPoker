@@ -13,9 +13,14 @@ namespace ScrumPoker.Hubs
             _lobby = lobby;
         }
 
-        public void JoinRoom(ushort room, string displayName)
+        public void JoinRoom(ushort roomId, string displayName)
         {
-            Clients.All.test(room, displayName);
+            var participant = new Participant(Context.ConnectionId, displayName);
+            var room = _lobby.Rooms[roomId];
+            room.Participants.Add(participant);
+            _lobby.ConnectedUsersRoom.Add(Context.ConnectionId, roomId);
+
+            SendMessage(string.Format("User '{0}' has joined", displayName));
         }
 
         public void SendMessage(string message)
