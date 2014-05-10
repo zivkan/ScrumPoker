@@ -10,7 +10,7 @@ namespace ScrumPoker.Hubs
         public class ParticipantInfo
         {
             public string Name { get; private set; }
-            public int? Bet { get; set; }
+            public string Bet { get; set; }
 
             public bool HasBet { get; private set; }
 
@@ -107,6 +107,16 @@ namespace ScrumPoker.Hubs
             }
 
             return participants;
+        }
+
+        public void Bet(string value)
+        {
+            var roomId = _lobby.ConnectedUsersRoom[Context.ConnectionId];
+            var room = _lobby.Rooms[roomId];
+            var me = room.Participants.Single(p => p.ConnectionId == Context.ConnectionId);
+            me.Bet = value;
+
+            SendRoomUpdate(room);
         }
     }
 }

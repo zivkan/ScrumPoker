@@ -113,6 +113,8 @@ scrumPokerControllers.controller('room', [
 
         $scope.$watch('myBet', function (newValue, oldValue) {
             if (newValue != null) {
+                if (newValue === '-')
+                    newValue = null;
                 $scope.server.Bet(newValue);
             }
         });
