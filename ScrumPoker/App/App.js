@@ -19,7 +19,7 @@ scrumPokerApp.factory('PokerServer', [
         var PokerServer = this;
 
         PokerServer.rooms = null;
-        PokerServer.roomMessages = [];
+        PokerServer.currentRoom = null;
 
         var lobby = $.connection.lobbyHub;
 
@@ -45,9 +45,11 @@ scrumPokerApp.factory('PokerServer', [
         }
 
         var room = $.connection.roomHub;
-        room.client.roomMessage = function (message) {
-            PokerServer.roomMessages.push(message);
-            $rootScope.$apply();
+        room.client.roomUpdate = function(participants) {
+            if (PokerServer.currentRoom != null) {
+                PokerServer.currentRoom.participants = participants;
+                $rootScope.$apply();
+            }
         }
 
         $.connection.hub.start().done(function () {
@@ -61,6 +63,7 @@ scrumPokerApp.factory('PokerServer', [
             lobby.server.createRoom(roomName, userName).done(function (result) {
                 if (result.roomId != null) {
                     PokerServer.currentRoom = { id: result.roomId, name: roomName };
+                    PokerServer.currentRoom.participants = result.participants;
                     $location.path('/room/' + result.roomId);
                     $rootScope.$apply();
                 }
@@ -70,6 +73,7 @@ scrumPokerApp.factory('PokerServer', [
         PokerServer.JoinRoom = function(roomId, userName) {
             room.server.joinRoom(roomId, userName).done(function (result) {
                 PokerServer.currentRoom = { id: roomId, name: 'later' };
+                PokerServer.currentRoom.participants = result;
                 if ($location.$$path.indexOf('/room/') == -1) {
                     $location.path('/room/' + roomId);
                 }
@@ -77,8 +81,8 @@ scrumPokerApp.factory('PokerServer', [
             });
         }
 
-        PokerServer.SendRoomMessage = function(message) {
-            room.server.sendMessage(message);
+        PokerServer.Bet = function(amount) {
+            room.server.bet(amount);
         }
 
         $rootScope.$on('$locationChangeStart', function (event, newUrl, oldUrl) {
@@ -106,5 +110,11 @@ scrumPokerControllers.controller('room', [
     '$scope', 'PokerServer', '$routeParams', function($scope, server, $routeParams) {
         $scope.server = server;
         $scope.roomId = $routeParams.roomId;
+
+        $scope.$watch('myBet', function (newValue, oldValue) {
+            if (newValue != null) {
+                $scope.server.Bet(newValue);
+            }
+        });
     }
 ]);

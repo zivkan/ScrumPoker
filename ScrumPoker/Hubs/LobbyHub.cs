@@ -11,6 +11,7 @@ namespace ScrumPoker.Hubs
         {
             public ushort? roomId;
             public string message;
+            public List<RoomHub.ParticipantInfo> participants;
         }
 
         private readonly Lobby _lobby;
@@ -32,9 +33,7 @@ namespace ScrumPoker.Hubs
             var participant = new Participant(Context.ConnectionId, userName);
             room.Participants.Add(participant);
             _lobby.ConnectedUsersRoom.Add(Context.ConnectionId, room.Id);
-            var groupName = string.Format("room-{0}", room.Id);
-            await Groups.Add(Context.ConnectionId, groupName);
-            Clients.Group(groupName).roomMessage(userName + " joined the room");
+            result.participants = RoomHub.GetParticipantInfo(room);
 
             if (room == null)
                 return result;

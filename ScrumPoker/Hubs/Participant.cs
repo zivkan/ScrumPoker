@@ -6,11 +6,13 @@ namespace ScrumPoker.Hubs
     {
         public string ConnectionId { get; private set; }
         public string Name { get; private set; }
+        public int? Bet { get; set; }
 
         public Participant(string connectionId, string name)
         {
             ConnectionId = connectionId;
             Name = name;
+            Bet = null;
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNet.SignalR;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -6,6 +7,21 @@ namespace ScrumPoker.Hubs
 {
     public class RoomHub : Hub
     {
+        public class ParticipantInfo
+        {
+            public string Name { get; private set; }
+            public int? Bet { get; set; }
+
+            public bool HasBet { get; private set; }
+
+            public ParticipantInfo(Participant participant)
+            {
+                Name = participant.Name;
+                Bet = participant.Bet;
+                HasBet = Bet != null;
+            }
+        }
+
         private readonly Lobby _lobby;
 
         public RoomHub(Lobby lobby)
@@ -13,7 +29,7 @@ namespace ScrumPoker.Hubs
             _lobby = lobby;
         }
 
-        public void JoinRoom(ushort roomId, string displayName)
+        public IEnumerable<ParticipantInfo> JoinRoom(ushort roomId, string displayName)
         {
             var participant = new Participant(Context.ConnectionId, displayName);
             var room = _lobby.Rooms[roomId];
@@ -21,6 +37,8 @@ namespace ScrumPoker.Hubs
             _lobby.ConnectedUsersRoom.Add(Context.ConnectionId, roomId);
 
             SendMessage(string.Format("User '{0}' has joined", displayName));
+
+            return GetParticipantInfo(room);
         }
 
         public void LeaveRoom()
@@ -39,7 +57,7 @@ namespace ScrumPoker.Hubs
                 if (participant != null)
                 {
                     room.Participants.Remove(participant);
-                    SendMessage(room, participant.Name + " has left the building");
+                    SendRoomUpdate(room);
                 }
             }
 
@@ -56,17 +74,39 @@ namespace ScrumPoker.Hubs
         {
             var roomId = _lobby.ConnectedUsersRoom[Context.ConnectionId];
 
-            SendMessage(_lobby.Rooms[roomId], message);
+            SendRoomUpdate(_lobby.Rooms[roomId]);
         }
 
-        private void SendMessage(Room room, string message)
+        private void SendRoomUpdate(Room room)
         {
+            var participants = GetParticipantInfo(room);
+
             foreach (var p in room.Participants)
             {
-                Clients.Client(p.ConnectionId).roomMessage("message = " + message);
+                Clients.Client(p.ConnectionId).roomUpdate(participants);
             }
-            
         }
 
+        internal static List<ParticipantInfo> GetParticipantInfo(Room room)
+        {
+            var participants = new List<ParticipantInfo>();
+            var everyoneBet = true;
+            foreach (var p in room.Participants)
+            {
+                participants.Add(new ParticipantInfo(p));
+                if (p.Bet == null)
+                    everyoneBet = false;
+            }
+
+            if (!everyoneBet)
+            {
+                foreach (var p in participants)
+                {
+                    p.Bet = null;
+                }
+            }
+
+            return participants;
+        }
     }
 }
