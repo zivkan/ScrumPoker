@@ -4,10 +4,11 @@ namespace ScrumPoker.Hubs
 {
     public class Room
     {
+
         public ushort Id { get; private set; }
         public string Name { get; private set; }
 
-        public IList<string> Participants { get; private set; }
+        public IList<Participant> Participants { get; private set; }
 
         public bool WasEmptyLastInterval { get; set; }
 
@@ -15,7 +16,7 @@ namespace ScrumPoker.Hubs
         {
             Id = id;
             Name = name;
-            Participants = new List<string>();
+            Participants = new List<Participant>();
             WasEmptyLastInterval = false;
         }
     }

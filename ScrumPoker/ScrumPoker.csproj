@@ -404,6 +404,7 @@
   <ItemGroup>
     <Compile Include="Hubs\Lobby.cs" />
     <Compile Include="Hubs\LobbyHub.cs" />
+    <Compile Include="Hubs\Participant.cs" />
     <Compile Include="Hubs\Room.cs" />
     <Compile Include="Hubs\RoomHub.cs" />
     <Compile Include="Hubs\RoomInfo.cs" />

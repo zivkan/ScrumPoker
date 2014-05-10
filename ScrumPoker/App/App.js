@@ -6,7 +6,7 @@ scrumPokerApp.config([
             templateUrl: 'partials/lobby.html',
             controller: 'lobby'
         }).
-            when('/room/:room', {
+            when('/room/:roomId', {
                 templateUrl: 'partials/room.html',
                 controller: 'room'
             }).
@@ -14,46 +14,109 @@ scrumPokerApp.config([
     }
 ]);
 
-var scrumPokerControllers = angular.module('scrumPokerControllers', []);
+scrumPokerApp.factory('PokerServer', [
+    '$rootScope', '$location', function ($rootScope, $location) {
+        var PokerServer = this;
 
-scrumPokerControllers.controller('lobby', ['$scope', function ($scope) {
-    $scope.rooms = null;
+        PokerServer.rooms = null;
+        PokerServer.currentRoom = null;
 
-    $scope.hub = $.connection.lobbyHub;
+        var lobby = $.connection.lobbyHub;
 
-    $scope.hub.client.roomAdded = function(room) {
-        $scope.rooms.push(room);
-        $scope.$apply();
-    };
-    $scope.hub.client.roomDeleted = function (roomId) {
-        var getRoomIndex = function(roomId) {
-            for (var i = 0; i < $scope.rooms.length; i++) {
-                if ($scope.rooms[i].Id == roomId) {
-                    return i;
+        lobby.client.roomAdded = function (room) {
+            PokerServer.rooms.push(room);
+            $rootScope.$apply();
+        };
+
+        lobby.client.roomDeleted = function (roomId) {
+            var getRoomIndex = function (roomId) {
+                for (var i = 0; i < PokerServer.rooms.length; i++) {
+                    if (PokerServer.rooms[i].Id == roomId) {
+                        return i;
+                    }
+                }
+                return -1;
+            }
+            var roomIndex = getRoomIndex(roomId);
+            if (roomIndex != -1) {
+                PokerServer.rooms.splice(roomIndex, 1);
+                $rootScope.$apply();
+            }
+        }
+
+        var room = $.connection.roomHub;
+        room.client.roomUpdate = function(participants) {
+            if (PokerServer.currentRoom != null) {
+                PokerServer.currentRoom.participants = participants;
+                $rootScope.$apply();
+            }
+        }
+
+        $.connection.hub.start().done(function () {
+            lobby.server.getRooms().done(function (rooms) {
+                PokerServer.rooms = rooms;
+                $rootScope.$apply();
+            });
+        });
+
+        PokerServer.CreateRoom = function (roomName, userName) {
+            lobby.server.createRoom(roomName, userName).done(function (result) {
+                if (result.roomId != null) {
+                    PokerServer.currentRoom = { id: result.roomId, name: roomName };
+                    PokerServer.currentRoom.participants = result.participants;
+                    $location.path('/room/' + result.roomId);
+                    $rootScope.$apply();
+                }
+            });
+        }
+
+        PokerServer.JoinRoom = function(roomId, userName) {
+            room.server.joinRoom(roomId, userName).done(function (result) {
+                PokerServer.currentRoom = { id: roomId, name: 'later' };
+                PokerServer.currentRoom.participants = result;
+                if ($location.$$path.indexOf('/room/') == -1) {
+                    $location.path('/room/' + roomId);
+                }
+                $rootScope.$apply();
+            });
+        }
+
+        PokerServer.Bet = function(amount) {
+            room.server.bet(amount);
+        }
+
+        $rootScope.$on('$locationChangeStart', function (event, newUrl, oldUrl) {
+            if (oldUrl.indexOf('/room/') != -1) {
+                if (PokerServer.currentRoom != null) {
+                    room.server.leaveRoom();
+                    PokerServer.currentRoom = null;
                 }
             }
-            return -1;
-        }
-        var roomIndex = getRoomIndex(roomId);
-        if (roomIndex != -1) {
-            $scope.rooms.splice(roomIndex, 1);
-            $scope.$apply();
-        }
-    }
-
-    $.connection.hub.start().done(function() {
-        $scope.hub.server.getRooms().done(function (rooms) {
-                $scope.rooms = rooms;
-            $scope.$apply();
         });
-    });
 
-    $scope.addRoomButton = function(name) {
-        $scope.hub.server.addRoom(name).done(function(result) {
-            var r = result;
+        return PokerServer;
+    }
+]);
+
+var scrumPokerControllers = angular.module('scrumPokerControllers', []);
+
+scrumPokerControllers.controller('lobby', [
+    '$scope', 'PokerServer', function ($scope, server) {
+        $scope.server = server;
+    }
+]);
+
+scrumPokerControllers.controller('room', [
+    '$scope', 'PokerServer', '$routeParams', function($scope, server, $routeParams) {
+        $scope.server = server;
+        $scope.roomId = $routeParams.roomId;
+
+        $scope.$watch('myBet', function (newValue, oldValue) {
+            if (newValue != null) {
+                if (newValue === '-')
+                    newValue = null;
+                $scope.server.Bet(newValue);
+            }
         });
     }
-
-}]);
-
-scrumPokerControllers.controller('room', ['$scope', function ($scope) { }]);
+]);

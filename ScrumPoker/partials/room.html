@@ -1,1 +1,32 @@
-﻿<div>This is a room</div>
+﻿<div ng-show="server.currentRoom == null" class="panel panel-default">
+    <div class="panel-heading">Door to room</div>
+    <div class="panel-body">
+        Name <input type="text" ng-model="myName" /><br />
+        <input type="button" value="Join" ng-click="server.JoinRoom(roomId, myName)" />
+    </div>
+</div>
+<div ng-show="server.currentRoom != null">
+    <div>
+        <div>
+            MyBet = {{myBet}}<br />
+            <input type="radio" name="bet" ng-model="myBet" value="-" id="nobet" /><label for="nobet">No bet</label>
+            <input type="radio" name="bet" ng-model="myBet" value="0" id="bet-0" /><label for="bet-0">0</label>
+            <input type="radio" name="bet" ng-model="myBet" value="1" id="bet-1" /><label for="bet-1">1</label>
+            <input type="radio" name="bet" ng-model="myBet" value="2" id="bet-2" /><label for="bet-2">2</label>
+            <input type="radio" name="bet" ng-model="myBet" value="3" id="bet-3" /><label for="bet-3">3</label>
+            <input type="radio" name="bet" ng-model="myBet" value="4" id="bet-4" /><label for="bet-4">4</label>
+            <input type="radio" name="bet" ng-model="myBet" value="5" id="bet-5" /><label for="bet-5">5</label>
+            <input type="radio" name="bet" ng-model="myBet" value="6" id="bet-6" /><label for="bet-6">6</label>
+            <input type="radio" name="bet" ng-model="myBet" value="7" id="bet-7" /><label for="bet-7">7</label>
+            <input type="radio" name="bet" ng-model="myBet" value="8" id="bet-8" /><label for="bet-8">8</label>
+            <input type="radio" name="bet" ng-model="myBet" value="9" id="bet-9" /><label for="bet-9">9</label>
+            <input type="radio" name="bet" ng-model="myBet" value="10" id="bet-10" /><label for="bet-10">10</label>
+        </div>
+        <div>
+            Participants<br />
+            <ul>
+                <li ng-repeat="p in server.currentRoom.participants">{{p}}</li>
+            </ul>
+        </div>
+    </div>
+</div>
