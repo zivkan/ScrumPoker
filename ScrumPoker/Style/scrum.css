@@ -1,0 +1,19 @@
+﻿.participant {
+    float: left;
+    width: 100px;
+    height: 120px;
+}
+
+.participant .bet {
+    width: 80px; 
+    height: 80px; 
+    border: 1px solid; 
+    vertical-align: middle; 
+    margin: auto;
+}
+
+.participant .name {
+    position: absolute; 
+    bottom: 0px; 
+    width: 100%;
+}
