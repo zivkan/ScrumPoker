@@ -157,10 +157,8 @@ scrumPokerControllers.controller('connection', ['$scope', '$modalInstance',
                 return "reconnecting";
             if (state == $.connection.connectionState.disconnected)
                 return "disconnected";
-            if (state == $.connection.connectionState.connected) {
-                $modalInstance.$dismiss();
+            if (state == $.connection.connectionState.connected)
                 return "connected";
-            }
             return "unknown state";
         }
 
