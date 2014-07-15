@@ -15,7 +15,7 @@ scrumPokerApp.config([
 ]);
 
 scrumPokerApp.factory('PokerServer', [
-    '$rootScope', '$location', function ($rootScope, $location) {
+    '$rootScope', '$location', '$modal', function ($rootScope, $location, $modal) {
         var PokerServer = this;
 
         PokerServer.rooms = null;
@@ -51,6 +51,30 @@ scrumPokerApp.factory('PokerServer', [
                 $rootScope.$apply();
             }
         }
+
+        PokerServer.modalInstance = null;
+
+        $.connection.hub.stateChanged(function (stateInfo) {
+            if (stateInfo.newState != $.connection.connectionState.connected)
+            {
+                if (PokerServer.modalInstance == null)
+                {
+                    PokerServer.modalInstance = $modal.open({
+                        templateUrl: 'partials/connection.html',
+                        controller: 'connection',
+                        backdrop: 'static'
+                    });
+                }
+            }
+            else
+            {
+                if (PokerServer.modalInstance != null)
+                {
+                    PokerServer.modalInstance.dismiss();
+                    PokerServer.modalInstance = null;
+                }
+            }
+        });
 
         $.connection.hub.start().done(function () {
             lobby.server.getRooms().done(function (rooms) {
@@ -120,5 +144,32 @@ scrumPokerControllers.controller('room', [
         });
 
         $scope.allowedBets = [ 0, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89 ];
+    }
+]);
+
+scrumPokerControllers.controller('connection', ['$scope', '$modalInstance',
+    function ($scope, $modalInstance) {
+
+        stateMessage = function (state) {
+            if (state == $.connection.connectionState.connecting)
+                return "connecting";
+            if (state == $.connection.connectionState.reconnecting)
+                return "reconnecting";
+            if (state == $.connection.connectionState.disconnected)
+                return "disconnected";
+            if (state == $.connection.connectionState.connected) {
+                $modalInstance.$dismiss();
+                return "connected";
+            }
+            return "unknown state";
+        }
+
+        $scope.connectionState = stateMessage($.connection.hub.state);
+
+        $.connection.hub.stateChanged(function (stateInfo) {
+            $scope.connectionState = stateMessage(stateInfo.newState);
+            $scope.$apply();
+        });
+
     }
 ]);
