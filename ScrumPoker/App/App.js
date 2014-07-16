@@ -76,12 +76,18 @@ scrumPokerApp.factory('PokerServer', [
             }
         });
 
-        $.connection.hub.start().done(function () {
-            lobby.server.getRooms().done(function (rooms) {
-                PokerServer.rooms = rooms;
-                $rootScope.$apply();
+        PokerServer.Reconnect = function() {
+            $.connection.hub.start().done(function () {
+                lobby.server.getRooms().done(function (rooms) {
+                    PokerServer.rooms = rooms;
+                    $rootScope.$apply();
+                });
+                if (PokerServer.currentRoom != null) {
+                    room.server.joinRoom(PokerServer.currentRoom.id, PokerServer.currentRoom.username);
+                }
             });
-        });
+        }
+        PokerServer.Reconnect();
 
         PokerServer.CreateRoom = function (roomName, userName) {
             lobby.server.createRoom(roomName, userName).done(function (result) {
@@ -96,7 +102,7 @@ scrumPokerApp.factory('PokerServer', [
 
         PokerServer.JoinRoom = function(roomId, userName) {
             room.server.joinRoom(roomId, userName).done(function (result) {
-                PokerServer.currentRoom = { id: roomId, name: 'later' };
+                PokerServer.currentRoom = { id: roomId, username: userName, name: 'later' };
                 PokerServer.currentRoom.participants = result;
                 if ($location.$$path.indexOf('/room/') == -1) {
                     $location.path('/room/' + roomId);
@@ -147,8 +153,9 @@ scrumPokerControllers.controller('room', [
     }
 ]);
 
-scrumPokerControllers.controller('connection', ['$scope', '$modalInstance',
-    function ($scope, $modalInstance) {
+scrumPokerControllers.controller('connection', ['$scope', '$modalInstance', 'PokerServer',
+    function ($scope, $modalInstance, PokerServer) {
+        $scope.PokerServer = PokerServer;
 
         stateMessage = function (state) {
             if (state == $.connection.connectionState.connecting)
