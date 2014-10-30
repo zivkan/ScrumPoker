@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ScrumPoker.Model;
 
 namespace ScrumPoker.Hubs
 {
@@ -29,7 +30,7 @@ namespace ScrumPoker.Hubs
             _lobby = lobby;
         }
 
-        public IEnumerable<ParticipantInfo> JoinRoom(ushort roomId, string displayName)
+        public RoomVotes JoinRoom(ushort roomId, string displayName)
         {
             var participant = new Participant(Context.ConnectionId, displayName);
             var room = _lobby.Rooms[roomId];
@@ -38,7 +39,7 @@ namespace ScrumPoker.Hubs
 
             SendMessage(string.Format("User '{0}' has joined", displayName));
 
-            return GetParticipantInfo(room);
+            return new RoomVotes(GetParticipantInfo(room));
         }
 
         public void LeaveRoom()
@@ -79,7 +80,7 @@ namespace ScrumPoker.Hubs
 
         private void SendRoomUpdate(Room room)
         {
-            var participants = GetParticipantInfo(room);
+            var participants = new RoomVotes(GetParticipantInfo(room));
 
             foreach (var p in room.Participants)
             {

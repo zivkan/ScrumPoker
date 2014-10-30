@@ -21,7 +21,7 @@
         <div class="panel panel-default">
             <div class="panel-heading">Participants</div>
             <div class="panel-body">
-                <div ng-repeat="p in server.currentRoom.participants" class="participant" style="position: relative; padding: 5px;">
+                <div ng-repeat="p in server.currentRoom.participants.Participants" class="participant" style="position: relative; padding: 5px;">
                     <div class="bet">
                         <div ng-show="p.Bet != null">{{p.Bet}}</div>
                         <div ng-show="p.Bet == null && p.HasBet">...</div>
@@ -31,11 +31,10 @@
                     </div>
                 </div>
             </div>
-            <ul>
-                <li ng-repeat="p in server.currentRoom.participants">
-                    {{p}}
-                </li>
-            </ul>
+            <div>
+                <div>Majority = {{server.currentRoom.participants.MajorityVote}}</div>
+                <div>Average = {{server.currentRoom.participants.Average}}</div>
+            </div>
         </div>
     </div>
 </div>
