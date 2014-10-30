@@ -37,33 +37,37 @@ namespace ScrumPoker.Model
                     int max = votes.Max(pair => pair.Value);
                     if (max < Participants.Count/2)
                     {
-                        return null;
+                        return "There is no majority";
                     }
 
                     List<KeyValuePair<string, int>> mostVotedOptions = votes.Where(pair => pair.Value == max).ToList();
                     if (mostVotedOptions.Count() > 1)
                     {
-                        return null;
+                        return "There is no majority";
                     }
                     else
                     {
                         return mostVotedOptions[0].Key;
                     }
                 }
-                return null;
+                return "Not everyone has voted yet";;
             }
         }
 
-        public double? Average
+        public string Average
         {
             get {
                 if (EveryoneHasVoted)
                 {
-                    return Participants.Average(p => Convert.ToInt32(p.Bet));
+                    var average = Participants.Average(p => Convert.ToInt32(p.Bet));
+                    if (average - Math.Floor(average) == 0.0)
+                        return Convert.ToInt32(average).ToString();
+                    return average.ToString("#.#");
+
                 }
                 else
                 {
-                    return null;
+                    return "Not everyone has voted yet";
                 }
             }
         }
