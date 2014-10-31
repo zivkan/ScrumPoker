@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNet.SignalR;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using ScrumPoker.Model;
+using System.Collections.Generic;
 
 namespace ScrumPoker.Hubs
 {
@@ -19,17 +18,18 @@ namespace ScrumPoker.Hubs
             return _lobby.GetAllPublicRooms();
         }
 
-        public async Task<CreateRoomResponse> CreateRoom(string roomName, string userName)
+        public CreateRoomResponse CreateRoom(string roomName, string userName)
         {
             Room room;
             var result = new CreateRoomResponse {Message = _lobby.CreateRoom(roomName, out room)};
+            if (room == null)
+                return result;
+
             var participant = new Participant(Context.ConnectionId, userName);
             room.Participants.Add(participant);
             _lobby.ConnectedUsersRoom.Add(Context.ConnectionId, room.Id);
             result.Participants = RoomHub.GetParticipantInfo(room);
 
-            if (room == null)
-                return result;
 
             result.RoomId = room.Id;
 

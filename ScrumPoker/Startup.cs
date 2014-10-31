@@ -36,7 +36,7 @@ namespace ScrumPoker
         private Container ConfigureDependancyInjector()
         {
             var container = new Container();
-            container.RegisterSingle<Lobby>(()=>new Lobby(GlobalHost.ConnectionManager.GetHubContext<LobbyHub>()));
+            container.RegisterSingle(()=>new Lobby(GlobalHost.ConnectionManager.GetHubContext<LobbyHub>()));
             return container;
         }
     }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 
 namespace ScrumPoker.Model
@@ -44,30 +45,24 @@ namespace ScrumPoker.Model
                     {
                         return "There is no majority";
                     }
-                    else
-                    {
-                        return mostVotedOptions[0].Key;
-                    }
+                    return mostVotedOptions[0].Key;
                 }
-                return "Not everyone has voted yet";;
+                return "Not everyone has voted yet";
             }
         }
 
         public string Average
         {
-            get {
+            get
+            {
                 if (EveryoneHasVoted)
                 {
                     var average = Participants.Average(p => Convert.ToInt32(p.Bet));
-                    if (average - Math.Floor(average) == 0.0)
-                        return Convert.ToInt32(average).ToString();
+                    if (Math.Abs(average - Math.Floor(average)) < 0.1)
+                        return Convert.ToInt32(average).ToString(CultureInfo.InvariantCulture);
                     return average.ToString("#.#");
-
                 }
-                else
-                {
-                    return "Not everyone has voted yet";
-                }
+                return "Not everyone has voted yet";
             }
         }
 
