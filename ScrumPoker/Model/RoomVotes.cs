@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Linq;
-using ScrumPoker.Hubs;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ScrumPoker.Model
 {

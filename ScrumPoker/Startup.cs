@@ -1,8 +1,6 @@
-﻿using System;
-using Microsoft.AspNet.SignalR;
+﻿using Microsoft.AspNet.SignalR;
 using Microsoft.AspNet.SignalR.Hubs;
 using Microsoft.Owin;
-using Microsoft.Owin.Security.Provider;
 using Owin;
 using ScrumPoker.Hubs;
 using ScrumPoker.Model;

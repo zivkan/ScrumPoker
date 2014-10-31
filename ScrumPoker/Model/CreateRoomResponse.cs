@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using ScrumPoker.Model;
+﻿using ScrumPoker.Model;
+using System.Collections.Generic;
 
 namespace ScrumPoker.Hubs
 {

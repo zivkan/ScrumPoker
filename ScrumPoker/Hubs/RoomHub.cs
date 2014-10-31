@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNet.SignalR;
+using ScrumPoker.Model;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using ScrumPoker.Model;
 
 namespace ScrumPoker.Hubs
 {
