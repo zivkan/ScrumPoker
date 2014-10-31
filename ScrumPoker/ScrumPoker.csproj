@@ -404,12 +404,14 @@
     <Content Include="Scripts\version.json" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Hubs\Lobby.cs" />
+    <Compile Include="Model\CreateRoomResponse.cs" />
+    <Compile Include="Model\Lobby.cs" />
     <Compile Include="Hubs\LobbyHub.cs" />
-    <Compile Include="Hubs\Participant.cs" />
-    <Compile Include="Hubs\Room.cs" />
+    <Compile Include="Model\ParticipantInfo.cs" />
+    <Compile Include="Model\Participant.cs" />
+    <Compile Include="Model\Room.cs" />
     <Compile Include="Hubs\RoomHub.cs" />
-    <Compile Include="Hubs\RoomInfo.cs" />
+    <Compile Include="Model\RoomInfo.cs" />
     <Compile Include="Model\RoomVotes.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Timers;
 using Microsoft.AspNet.SignalR;
 
-namespace ScrumPoker.Hubs
+namespace ScrumPoker.Model
 {
     public class Lobby
     {

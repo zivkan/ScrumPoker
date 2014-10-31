@@ -8,12 +8,12 @@ namespace ScrumPoker.Model
     public class RoomVotes
     {
 
-        public RoomVotes(IEnumerable<RoomHub.ParticipantInfo> participants)
+        public RoomVotes(IEnumerable<ParticipantInfo> participants)
         {
             Participants = participants.ToList();
         }
 
-        public IList<RoomHub.ParticipantInfo> Participants { get; private set; }
+        public IList<ParticipantInfo> Participants { get; private set; }
 
         public string MajorityVote
         {
@@ -22,7 +22,7 @@ namespace ScrumPoker.Model
                 if (EveryoneHasVoted)
                 {
                     Dictionary<string, int> votes = new Dictionary<string, int>();
-                    foreach (RoomHub.ParticipantInfo participantInfo in Participants)
+                    foreach (ParticipantInfo participantInfo in Participants)
                     {
                         if (!votes.ContainsKey(participantInfo.Bet))
                         {

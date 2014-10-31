@@ -1,4 +1,4 @@
-﻿namespace ScrumPoker.Hubs
+﻿namespace ScrumPoker.Model
 {
     public class RoomInfo
     {

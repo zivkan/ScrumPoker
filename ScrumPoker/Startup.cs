@@ -5,6 +5,7 @@ using Microsoft.Owin;
 using Microsoft.Owin.Security.Provider;
 using Owin;
 using ScrumPoker.Hubs;
+using ScrumPoker.Model;
 using SimpleInjector;
 
 [assembly: OwinStartup(typeof(ScrumPoker.Startup))]

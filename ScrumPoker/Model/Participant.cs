@@ -1,6 +1,4 @@
-﻿using System.EnterpriseServices;
-
-namespace ScrumPoker.Hubs
+﻿namespace ScrumPoker.Model
 {
     public class Participant
     {

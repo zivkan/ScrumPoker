@@ -8,21 +8,6 @@ namespace ScrumPoker.Hubs
 {
     public class RoomHub : Hub
     {
-        public class ParticipantInfo
-        {
-            public string Name { get; private set; }
-            public string Bet { get; set; }
-
-            public bool HasBet { get; private set; }
-
-            public ParticipantInfo(Participant participant)
-            {
-                Name = participant.Name;
-                Bet = participant.Bet;
-                HasBet = Bet != null;
-            }
-        }
-
         private readonly Lobby _lobby;
 
         public RoomHub(Lobby lobby)
