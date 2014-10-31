@@ -88,7 +88,18 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="ajax-loader.gif" />
-    <Content Include="App\App.js" />
+    <Content Include="App\App.js">
+      <DependentUpon>App.js.bundle</DependentUpon>
+    </Content>
+    <Content Include="App\App.min.js">
+      <DependentUpon>App.js</DependentUpon>
+    </Content>
+    <Content Include="App\AppModule.js" />
+    <Content Include="App\ConnectionController.js" />
+    <Content Include="App\ControllerModule.js" />
+    <Content Include="App\LobbyController.js" />
+    <Content Include="App\PokerServer.js" />
+    <Content Include="App\RoomController.js" />
     <Content Include="Content\bootstrap-theme.css" />
     <Content Include="Content\bootstrap-theme.min.css" />
     <Content Include="Content\bootstrap.css" />
@@ -101,6 +112,10 @@
     <Content Include="fonts\glyphicons-halflings-regular.eot" />
     <Content Include="Content\bootstrap-theme.css.map" />
     <Content Include="Content\bootstrap.css.map" />
+    <Content Include="App\App.js.bundle" />
+    <Content Include="App\App.min.js.map">
+      <DependentUpon>App.min.js</DependentUpon>
+    </Content>
     <None Include="Scripts\jquery-1.11.0.intellisense.js" />
     <Content Include="partials\connection.html" />
     <Content Include="Scripts\bootstrap.js" />
