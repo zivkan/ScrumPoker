@@ -1,33 +1,23 @@
 ﻿(function() {
     'use strict';
     angular.module('scrumPokerApp').factory('PokerServer', [
-        '$rootScope', '$location', '$modal', function($rootScope, $location, $modal) {
-            var PokerServer = this;
+        '$rootScope', '$location', '$modal', '$q', function($rootScope, $location, $modal, $q) {
+            var PokerServer = $rootScope.$new();
 
-            PokerServer.rooms = null;
             PokerServer.currentRoom = null;
 
             var lobby = $.connection.lobbyHub;
 
-            lobby.client.roomAdded = function(room) {
-                PokerServer.rooms.push(room);
-                $rootScope.$apply();
+            PokerServer.getRooms = function() {
+                return $q.when(lobby.server.getRooms());
             };
 
-            lobby.client.roomDeleted = function(roomId) {
-                var getRoomIndex = function(roomId) {
-                    for (var i = 0; i < PokerServer.rooms.length; i++) {
-                        if (PokerServer.rooms[i].Id === roomId) {
-                            return i;
-                        }
-                    }
-                    return -1;
-                };
-                var roomIndex = getRoomIndex(roomId);
-                if (roomIndex !== -1) {
-                    PokerServer.rooms.splice(roomIndex, 1);
-                    $rootScope.$apply();
-                }
+            lobby.client.roomAdded = function(room) {
+                PokerServer.$emit('roomAdded', room);
+            };
+
+            lobby.client.roomDeleted = function (roomId) {
+                PokerServer.$emit('roomDeleted', roomId);
             };
 
             var room = $.connection.roomHub;
@@ -58,17 +48,8 @@
             });
 
             PokerServer.Reconnect = function() {
-                $.connection.hub.start().done(function() {
-                    lobby.server.getRooms().done(function(rooms) {
-                        PokerServer.rooms = rooms;
-                        $rootScope.$apply();
-                    });
-                    if (PokerServer.currentRoom !== null) {
-                        room.server.joinRoom(PokerServer.currentRoom.id, PokerServer.currentRoom.username);
-                    }
-                });
+                return $q.when($.connection.hub.start());
             };
-            PokerServer.Reconnect();
 
             PokerServer.CreateRoom = function(roomName, userName) {
                 lobby.server.createRoom(roomName, userName).done(function(result) {

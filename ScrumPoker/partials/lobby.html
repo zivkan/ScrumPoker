@@ -15,9 +15,9 @@
     <div class="panel panel-default">
         <div class="panel-heading">Available rooms</div>
         <div class="panel-body">
-            <div ng-show="server.rooms == null"><img src="..\ajax-loader.gif" /></div>
-            <accordion close-others="true" ng-show="server.rooms != null">
-                <accordion-group ng-repeat="room in server.rooms" is-open="isopen">
+            <div ng-show="rooms == null"><img src="..\ajax-loader.gif" /></div>
+            <accordion close-others="true" ng-show="rooms != null">
+                <accordion-group ng-repeat="room in rooms" is-open="isopen">
                     <accordion-heading>
                         <i class="glyphicon" ng-class="{true:'glyphicon-chevron-down', false:'glyphicon-chevron-right'}[isopen]"></i>
                         {{room.Name}}
