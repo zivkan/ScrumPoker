@@ -35,16 +35,16 @@
             $scope.PokerServer = PokerServer;
 
             var stateMessage = function(state) {
-                if (state == $.connection.connectionState.connecting)
+                if (state === $.connection.connectionState.connecting)
                     return "connecting";
-                if (state == $.connection.connectionState.reconnecting)
+                if (state === $.connection.connectionState.reconnecting)
                     return "reconnecting";
-                if (state == $.connection.connectionState.disconnected)
+                if (state === $.connection.connectionState.disconnected)
                     return "disconnected";
-                if (state == $.connection.connectionState.connected)
+                if (state === $.connection.connectionState.connected)
                     return "connected";
                 return "unknown state";
-            }
+            };
 
             $scope.connectionState = stateMessage($.connection.hub.state);
 
@@ -63,33 +63,29 @@
     'use strict';
 
     angular.module('scrumPokerControllers').controller('lobby', [
-        '$scope', 'PokerServer', function($scope, server) {
+        '$scope', 'PokerServer', function ($scope, server) {
             $scope.server = server;
 
             $scope.rooms = null;
 
-            server.Reconnect().then(function() {
-                server.getRooms().then(function(data) {
-                        $scope.rooms = data;
-                    },
-                    function(p1, p2, p3, p4) {
-                        $scope.error = 'an error happened';
-                    });
+            server.Reconnect().then(function () {
+                server.getRooms().then(function (data) {
+                    $scope.rooms = data;
+                });
             });
 
-
-            server.$on('roomAdded', function(event, room) {
-                $scope.$apply(function() {
+            server.$on('roomAdded', function (event, room) {
+                $scope.$apply(function () {
                     if ($scope.rooms != null) {
                         $scope.rooms.push(room);
                     }
                 });
             });
 
-            server.$on('roomDeleted', function(event, roomId) {
+            server.$on('roomDeleted', function (event, roomId) {
                 for (var i = 0; i < $scope.rooms.length; i++) {
                     if ($scope.rooms[i].Id === roomId) {
-                        $scope.$apply(function() { $scope.rooms.splice(i, 1); });
+                        $scope.$apply(function () { $scope.rooms.splice(i, 1); });
                         break;
                     }
                 }
@@ -204,7 +200,7 @@
             $scope.roomId = $routeParams.roomId;
 
             $scope.$watch('myBet', function(newValue, oldValue) {
-                if (newValue != null) {
+                if (newValue !== null) {
                     if (newValue === '-')
                         newValue = null;
                     $scope.server.Bet(newValue);

@@ -7,16 +7,16 @@
             $scope.PokerServer = PokerServer;
 
             var stateMessage = function(state) {
-                if (state == $.connection.connectionState.connecting)
+                if (state === $.connection.connectionState.connecting)
                     return "connecting";
-                if (state == $.connection.connectionState.reconnecting)
+                if (state === $.connection.connectionState.reconnecting)
                     return "reconnecting";
-                if (state == $.connection.connectionState.disconnected)
+                if (state === $.connection.connectionState.disconnected)
                     return "disconnected";
-                if (state == $.connection.connectionState.connected)
+                if (state === $.connection.connectionState.connected)
                     return "connected";
                 return "unknown state";
-            }
+            };
 
             $scope.connectionState = stateMessage($.connection.hub.state);
 

@@ -7,7 +7,7 @@
             $scope.roomId = $routeParams.roomId;
 
             $scope.$watch('myBet', function(newValue, oldValue) {
-                if (newValue != null) {
+                if (newValue !== null) {
                     if (newValue === '-')
                         newValue = null;
                     $scope.server.Bet(newValue);
