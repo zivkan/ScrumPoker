@@ -2,7 +2,7 @@
     <div class="panel-heading">Door to room</div>
     <div class="panel-body">
         Name <input type="text" ng-model="myName" /><br />
-        <input type="button" value="Join" ng-click="server.JoinRoom(roomId, myName)" />
+        <input type="button" value="Join" ng-click="JoinRoom(roomId, myName)" />
     </div>
 </div>
 <div ng-show="server.currentRoom != null">
@@ -11,10 +11,10 @@
             MyBet = {{myBet}}<br />
             <div class="btn-group">
                 <label class="btn btn-primary">
-                    <input type="radio" name="bet" ng-model="myBet" value="-" id="nobet" />No bet
+                    <input type="radio" name="bet" ng-model="myBet" value="-" id="nobet" ng-change="Bet(myBet)"/>No bet
                 </label>
                 <label class="btn btn-primary" ng-repeat="bet in allowedBets">
-                    <input type="radio" name="bet" ng-model="$parent.myBet" value="{{bet}}" id="bet-{{$index}}" />{{bet}}
+                    <input type="radio" name="bet" ng-model="$parent.myBet" value="{{bet}}" id="bet-{{$index}}" ng-change="Bet(myBet)" />{{bet}}
                 </label>
             </div>
         </div>

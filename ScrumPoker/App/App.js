@@ -1,180 +1,228 @@
-﻿var scrumPokerApp = angular.module('scrumPokerApp', ['ngRoute', 'ui.bootstrap', 'scrumPokerControllers']);
+﻿///#source 1 1 /App/AppModule.js
+(function() {
+    'use strict';
 
-scrumPokerApp.config([
-    '$routeProvider', function ($routeProvider) {
-        $routeProvider.when('/', {
-            templateUrl: 'partials/lobby.html',
-            controller: 'lobby'
-        }).
-            when('/room/:roomId', {
-                templateUrl: 'partials/room.html',
-                controller: 'room'
-            }).
-            otherwise({ redirectTo: '/' });
-    }
-]);
+    var scrumPokerApp = angular.module('scrumPokerApp', ['ngRoute', 'ui.bootstrap', 'scrumPokerControllers']);
 
-scrumPokerApp.factory('PokerServer', [
-    '$rootScope', '$location', '$modal', function ($rootScope, $location, $modal) {
-        var PokerServer = this;
+    scrumPokerApp.config([
+        '$routeProvider', function($routeProvider) {
+            $routeProvider.when('/', {
+                    templateUrl: 'partials/lobby.html',
+                    controller: 'lobby'
+                }).
+                when('/room/:roomId', {
+                    templateUrl: 'partials/room.html',
+                    controller: 'room'
+                }).
+                otherwise({ redirectTo: '/' });
+        }
+    ]);
+})();
 
-        PokerServer.rooms = null;
-        PokerServer.currentRoom = null;
+///#source 1 1 /App/ControllerModule.js
+(function () {
+    'use strict';
+    angular.module('scrumPokerControllers', []);
+})();
 
-        var lobby = $.connection.lobbyHub;
+///#source 1 1 /App/ConnectionController.js
+(function() {
+    'use strict';
 
-        lobby.client.roomAdded = function (room) {
-            PokerServer.rooms.push(room);
-            $rootScope.$apply();
-        };
+    angular.module('scrumPokerControllers').controller('connection', [
+        '$scope', '$modalInstance', 'PokerServer',
+        function($scope, $modalInstance, PokerServer) {
+            $scope.PokerServer = PokerServer;
 
-        lobby.client.roomDeleted = function (roomId) {
-            var getRoomIndex = function (roomId) {
-                for (var i = 0; i < PokerServer.rooms.length; i++) {
-                    if (PokerServer.rooms[i].Id == roomId) {
-                        return i;
+            var stateMessage = function(state) {
+                if (state === $.connection.connectionState.connecting)
+                    return "connecting";
+                if (state === $.connection.connectionState.reconnecting)
+                    return "reconnecting";
+                if (state === $.connection.connectionState.disconnected)
+                    return "disconnected";
+                if (state === $.connection.connectionState.connected)
+                    return "connected";
+                return "unknown state";
+            };
+
+            $scope.connectionState = stateMessage($.connection.hub.state);
+
+            $.connection.hub.stateChanged(function(stateInfo) {
+                $scope.connectionState = stateMessage(stateInfo.newState);
+                $scope.$apply();
+            });
+
+        }
+    ]);
+
+})();
+
+///#source 1 1 /App/LobbyController.js
+(function () {
+    'use strict';
+
+    angular.module('scrumPokerControllers').controller('lobby', [
+        '$scope', 'PokerServer', '$location', function ($scope, server, $location) {
+            $scope.rooms = null;
+
+            server.Reconnect().then(function () {
+                server.getRooms().then(function (data) {
+                    $scope.rooms = data;
+                });
+            });
+
+            var goToRoom = function(roomId, roomName, userName, participants) {
+                server.currentRoom = { id: roomId, name: roomName, username: userName };
+                server.currentRoom.participants = participants;
+                $location.path('/room/' + roomId);
+            };
+
+            $scope.CreateRoom = function(roomName, userName) {
+                server.CreateRoom(roomName, userName).then(function(result) {
+                    if (result.RoomId !== null) {
+                        goToRoom(result.RoomId, roomName, userName, result.participants);
+                    }
+                });
+            };
+
+            $scope.JoinRoom = function (roomId, userName) {
+                server.JoinRoom(roomId, userName).then(function (result) {
+                    goToRoom(roomId, 'unknown', userName, result);
+                });
+            };
+
+            server.$on('roomAdded', function (event, room) {
+                $scope.$apply(function () {
+                    if ($scope.rooms !== null) {
+                        $scope.rooms.push(room);
+                    }
+                });
+            });
+
+            server.$on('roomDeleted', function (event, roomId) {
+                var removeRoom = function(index) { $scope.rooms.splice(index, 1); };
+                for (var i = 0; i < $scope.rooms.length; i++) {
+                    if ($scope.rooms[i].Id === roomId) {
+                        $scope.$apply(removeRoom(i));
+                        break;
                     }
                 }
-                return -1;
-            }
-            var roomIndex = getRoomIndex(roomId);
-            if (roomIndex != -1) {
-                PokerServer.rooms.splice(roomIndex, 1);
-                $rootScope.$apply();
-            }
+            });
+
         }
+    ]);
 
-        var room = $.connection.roomHub;
-        room.client.roomUpdate = function(participants) {
-            if (PokerServer.currentRoom != null) {
-                PokerServer.currentRoom.participants = participants;
-                $rootScope.$apply();
-            }
-        }
+})();
 
-        PokerServer.modalInstance = null;
+///#source 1 1 /App/PokerServer.js
+(function() {
+    'use strict';
+    angular.module('scrumPokerApp').factory('PokerServer', [
+        '$rootScope', '$location', '$modal', '$q', function($rootScope, $location, $modal, $q) {
+            var PokerServer = $rootScope.$new();
 
-        $.connection.hub.stateChanged(function (stateInfo) {
-            if (stateInfo.newState != $.connection.connectionState.connected)
-            {
-                if (PokerServer.modalInstance == null)
-                {
-                    PokerServer.modalInstance = $modal.open({
-                        templateUrl: 'partials/connection.html',
-                        controller: 'connection',
-                        backdrop: 'static'
-                    });
-                }
-            }
-            else
-            {
-                if (PokerServer.modalInstance != null)
-                {
-                    PokerServer.modalInstance.dismiss();
-                    PokerServer.modalInstance = null;
-                }
-            }
-        });
+            PokerServer.currentRoom = null;
 
-        PokerServer.Reconnect = function() {
-            $.connection.hub.start().done(function () {
-                lobby.server.getRooms().done(function (rooms) {
-                    PokerServer.rooms = rooms;
+            var lobby = $.connection.lobbyHub;
+
+            PokerServer.getRooms = function() {
+                return $q.when(lobby.server.getRooms());
+            };
+
+            lobby.client.roomAdded = function(room) {
+                PokerServer.$emit('roomAdded', room);
+            };
+
+            lobby.client.roomDeleted = function (roomId) {
+                PokerServer.$emit('roomDeleted', roomId);
+            };
+
+            var room = $.connection.roomHub;
+            room.client.roomUpdate = function(participants) {
+                if (PokerServer.currentRoom !== null) {
+                    PokerServer.currentRoom.participants = participants;
                     $rootScope.$apply();
+                }
+            };
+
+            PokerServer.modalInstance = null;
+
+            $.connection.hub.stateChanged(function(stateInfo) {
+                if (stateInfo.newState !== $.connection.connectionState.connected) {
+                    if (PokerServer.modalInstance === null) {
+                        PokerServer.modalInstance = $modal.open({
+                            templateUrl: 'partials/connection.html',
+                            controller: 'connection',
+                            backdrop: 'static'
+                        });
+                    }
+                } else {
+                    if (PokerServer.modalInstance !== null) {
+                        PokerServer.modalInstance.dismiss();
+                        PokerServer.modalInstance = null;
+                    }
+                }
+            });
+
+            PokerServer.Reconnect = function() {
+                return $q.when($.connection.hub.start());
+            };
+
+            PokerServer.CreateRoom = function (roomName, userName) {
+                return $q.when(lobby.server.createRoom(roomName, userName));
+            };
+
+            PokerServer.JoinRoom = function(roomId, userName) {
+                return $q.when(room.server.joinRoom(roomId, userName));
+            };
+
+            PokerServer.Bet = function(amount) {
+                room.server.bet(amount);
+            };
+
+            $rootScope.$on('$locationChangeStart', function(event, newUrl, oldUrl) {
+                if (oldUrl.indexOf('/room/') !== -1) {
+                    if (PokerServer.currentRoom !== null) {
+                        room.server.leaveRoom();
+                        PokerServer.currentRoom = null;
+                    }
+                }
+            });
+
+            return PokerServer;
+        }
+    ]);
+})();
+
+///#source 1 1 /App/RoomController.js
+(function() {
+    'use strict';
+
+    angular.module('scrumPokerControllers').controller('room', [
+        '$scope', 'PokerServer', '$routeParams', function($scope, server, $routeParams) {
+            $scope.server = server;
+            $scope.roomId = $routeParams.roomId;
+
+            $scope.allowedBets = [0, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89];
+
+            server.Reconnect();
+
+            $scope.JoinRoom = function(roomId, userName) {
+                server.JoinRoom(roomId, userName).then(function(result) {
+                    server.currentRoom = { id: roomId, name: 'unknown', username: userName };
+                    server.currentRoom.participants = result;
                 });
-                if (PokerServer.currentRoom != null) {
-                    room.server.joinRoom(PokerServer.currentRoom.id, PokerServer.currentRoom.username);
-                }
-            });
+            };
+
+            $scope.Bet = function(value) {
+                if (value === '-')
+                    value = null;
+                server.Bet(value);
+            };
+
         }
-        PokerServer.Reconnect();
+    ]);
 
-        PokerServer.CreateRoom = function (roomName, userName) {
-            lobby.server.createRoom(roomName, userName).done(function (result) {
-                if (result.roomId != null) {
-                    PokerServer.currentRoom = { id: result.roomId, name: roomName };
-                    PokerServer.currentRoom.participants = result.participants;
-                    $location.path('/room/' + result.roomId);
-                    $rootScope.$apply();
-                }
-            });
-        }
+})();
 
-        PokerServer.JoinRoom = function(roomId, userName) {
-            room.server.joinRoom(roomId, userName).done(function (result) {
-                PokerServer.currentRoom = { id: roomId, username: userName, name: 'later' };
-                PokerServer.currentRoom.participants = result;
-                if ($location.$$path.indexOf('/room/') == -1) {
-                    $location.path('/room/' + roomId);
-                }
-                $rootScope.$apply();
-            });
-        }
-
-        PokerServer.Bet = function(amount) {
-            room.server.bet(amount);
-        }
-
-        $rootScope.$on('$locationChangeStart', function (event, newUrl, oldUrl) {
-            if (oldUrl.indexOf('/room/') != -1) {
-                if (PokerServer.currentRoom != null) {
-                    room.server.leaveRoom();
-                    PokerServer.currentRoom = null;
-                }
-            }
-        });
-
-        return PokerServer;
-    }
-]);
-
-var scrumPokerControllers = angular.module('scrumPokerControllers', []);
-
-scrumPokerControllers.controller('lobby', [
-    '$scope', 'PokerServer', function ($scope, server) {
-        $scope.server = server;
-    }
-]);
-
-scrumPokerControllers.controller('room', [
-    '$scope', 'PokerServer', '$routeParams', function($scope, server, $routeParams) {
-        $scope.server = server;
-        $scope.roomId = $routeParams.roomId;
-
-        $scope.$watch('myBet', function (newValue, oldValue) {
-            if (newValue != null) {
-                if (newValue === '-')
-                    newValue = null;
-                $scope.server.Bet(newValue);
-            }
-        });
-
-        $scope.allowedBets = [ 0, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89 ];
-    }
-]);
-
-scrumPokerControllers.controller('connection', ['$scope', '$modalInstance', 'PokerServer',
-    function ($scope, $modalInstance, PokerServer) {
-        $scope.PokerServer = PokerServer;
-
-        stateMessage = function (state) {
-            if (state == $.connection.connectionState.connecting)
-                return "connecting";
-            if (state == $.connection.connectionState.reconnecting)
-                return "reconnecting";
-            if (state == $.connection.connectionState.disconnected)
-                return "disconnected";
-            if (state == $.connection.connectionState.connected)
-                return "connected";
-            return "unknown state";
-        }
-
-        $scope.connectionState = stateMessage($.connection.hub.state);
-
-        $.connection.hub.stateChanged(function (stateInfo) {
-            $scope.connectionState = stateMessage(stateInfo.newState);
-            $scope.$apply();
-        });
-
-    }
-]);

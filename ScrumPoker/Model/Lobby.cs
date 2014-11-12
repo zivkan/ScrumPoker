@@ -1,11 +1,11 @@
+using Microsoft.AspNet.SignalR;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Timers;
-using Microsoft.AspNet.SignalR;
 
-namespace ScrumPoker.Hubs
+namespace ScrumPoker.Model
 {
     public class Lobby
     {

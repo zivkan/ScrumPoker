@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace ScrumPoker.Hubs
+namespace ScrumPoker.Model
 {
     public class Room
     {

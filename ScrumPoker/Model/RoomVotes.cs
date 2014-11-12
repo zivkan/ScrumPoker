@@ -1,19 +1,19 @@
 ﻿using System;
-using System.Linq;
-using ScrumPoker.Hubs;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
 
 namespace ScrumPoker.Model
 {
     public class RoomVotes
     {
 
-        public RoomVotes(IEnumerable<RoomHub.ParticipantInfo> participants)
+        public RoomVotes(IEnumerable<ParticipantInfo> participants)
         {
             Participants = participants.ToList();
         }
 
-        public IList<RoomHub.ParticipantInfo> Participants { get; private set; }
+        public IList<ParticipantInfo> Participants { get; private set; }
 
         public string MajorityVote
         {
@@ -22,7 +22,7 @@ namespace ScrumPoker.Model
                 if (EveryoneHasVoted)
                 {
                     Dictionary<string, int> votes = new Dictionary<string, int>();
-                    foreach (RoomHub.ParticipantInfo participantInfo in Participants)
+                    foreach (ParticipantInfo participantInfo in Participants)
                     {
                         if (!votes.ContainsKey(participantInfo.Bet))
                         {
@@ -45,30 +45,24 @@ namespace ScrumPoker.Model
                     {
                         return "There is no majority";
                     }
-                    else
-                    {
-                        return mostVotedOptions[0].Key;
-                    }
+                    return mostVotedOptions[0].Key;
                 }
-                return "Not everyone has voted yet";;
+                return "Not everyone has voted yet";
             }
         }
 
         public string Average
         {
-            get {
+            get
+            {
                 if (EveryoneHasVoted)
                 {
                     var average = Participants.Average(p => Convert.ToInt32(p.Bet));
-                    if (average - Math.Floor(average) == 0.0)
-                        return Convert.ToInt32(average).ToString();
+                    if (Math.Abs(average - Math.Floor(average)) < 0.1)
+                        return Convert.ToInt32(average).ToString(CultureInfo.InvariantCulture);
                     return average.ToString("#.#");
-
                 }
-                else
-                {
-                    return "Not everyone has voted yet";
-                }
+                return "Not everyone has voted yet";
             }
         }
 
