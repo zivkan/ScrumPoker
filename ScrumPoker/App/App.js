@@ -63,9 +63,7 @@
     'use strict';
 
     angular.module('scrumPokerControllers').controller('lobby', [
-        '$scope', 'PokerServer', function ($scope, server) {
-            $scope.server = server;
-
+        '$scope', 'PokerServer', '$location', function ($scope, server, $location) {
             $scope.rooms = null;
 
             server.Reconnect().then(function () {
@@ -74,18 +72,39 @@
                 });
             });
 
+            var goToRoom = function(roomId, roomName, userName, participants) {
+                server.currentRoom = { id: roomId, name: roomName, username: userName };
+                server.currentRoom.participants = participants;
+                $location.path('/room/' + roomId);
+            };
+
+            $scope.CreateRoom = function(roomName, userName) {
+                server.CreateRoom(roomName, userName).then(function(result) {
+                    if (result.RoomId !== null) {
+                        goToRoom(result.RoomId, roomName, userName, result.participants);
+                    }
+                });
+            };
+
+            $scope.JoinRoom = function (roomId, userName) {
+                server.JoinRoom(roomId, userName).then(function (result) {
+                    goToRoom(roomId, 'unknown', userName, result);
+                });
+            };
+
             server.$on('roomAdded', function (event, room) {
                 $scope.$apply(function () {
-                    if ($scope.rooms != null) {
+                    if ($scope.rooms !== null) {
                         $scope.rooms.push(room);
                     }
                 });
             });
 
             server.$on('roomDeleted', function (event, roomId) {
+                var removeRoom = function(index) { $scope.rooms.splice(index, 1); };
                 for (var i = 0; i < $scope.rooms.length; i++) {
                     if ($scope.rooms[i].Id === roomId) {
-                        $scope.$apply(function () { $scope.rooms.splice(i, 1); });
+                        $scope.$apply(removeRoom(i));
                         break;
                     }
                 }
@@ -150,26 +169,12 @@
                 return $q.when($.connection.hub.start());
             };
 
-            PokerServer.CreateRoom = function(roomName, userName) {
-                lobby.server.createRoom(roomName, userName).done(function(result) {
-                    if (result.RoomId !== null) {
-                        PokerServer.currentRoom = { id: result.RoomId, name: roomName };
-                        PokerServer.currentRoom.participants = result.participants;
-                        $location.path('/room/' + result.RoomId);
-                        $rootScope.$apply();
-                    }
-                });
+            PokerServer.CreateRoom = function (roomName, userName) {
+                return $q.when(lobby.server.createRoom(roomName, userName));
             };
 
             PokerServer.JoinRoom = function(roomId, userName) {
-                room.server.joinRoom(roomId, userName).done(function(result) {
-                    PokerServer.currentRoom = { id: roomId, username: userName, name: 'later' };
-                    PokerServer.currentRoom.participants = result;
-                    if ($location.$$path.indexOf('/room/') === -1) {
-                        $location.path('/room/' + roomId);
-                    }
-                    $rootScope.$apply();
-                });
+                return $q.when(room.server.joinRoom(roomId, userName));
             };
 
             PokerServer.Bet = function(amount) {
@@ -199,15 +204,23 @@
             $scope.server = server;
             $scope.roomId = $routeParams.roomId;
 
-            $scope.$watch('myBet', function(newValue, oldValue) {
-                if (newValue !== null) {
-                    if (newValue === '-')
-                        newValue = null;
-                    $scope.server.Bet(newValue);
-                }
-            });
-
             $scope.allowedBets = [0, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89];
+
+            server.Reconnect();
+
+            $scope.JoinRoom = function(roomId, userName) {
+                server.JoinRoom(roomId, userName).then(function(result) {
+                    server.currentRoom = { id: roomId, name: 'unknown', username: userName };
+                    server.currentRoom.participants = result;
+                });
+            };
+
+            $scope.Bet = function(value) {
+                if (value === '-')
+                    value = null;
+                server.Bet(value);
+            };
+
         }
     ]);
 

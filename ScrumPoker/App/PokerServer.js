@@ -51,26 +51,12 @@
                 return $q.when($.connection.hub.start());
             };
 
-            PokerServer.CreateRoom = function(roomName, userName) {
-                lobby.server.createRoom(roomName, userName).done(function(result) {
-                    if (result.RoomId !== null) {
-                        PokerServer.currentRoom = { id: result.RoomId, name: roomName };
-                        PokerServer.currentRoom.participants = result.participants;
-                        $location.path('/room/' + result.RoomId);
-                        $rootScope.$apply();
-                    }
-                });
+            PokerServer.CreateRoom = function (roomName, userName) {
+                return $q.when(lobby.server.createRoom(roomName, userName));
             };
 
             PokerServer.JoinRoom = function(roomId, userName) {
-                room.server.joinRoom(roomId, userName).done(function(result) {
-                    PokerServer.currentRoom = { id: roomId, username: userName, name: 'later' };
-                    PokerServer.currentRoom.participants = result;
-                    if ($location.$$path.indexOf('/room/') === -1) {
-                        $location.path('/room/' + roomId);
-                    }
-                    $rootScope.$apply();
-                });
+                return $q.when(room.server.joinRoom(roomId, userName));
             };
 
             PokerServer.Bet = function(amount) {
