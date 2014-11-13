@@ -31,7 +31,7 @@ namespace ScrumPoker.Model
 
             foreach (var room in Rooms)
             {
-                if (room.Value.Participants.Count == 0)
+                if (room.Value.Voters.Count == 0 && room.Value.Viewers.Count == 0)
                 {
                     if (room.Value.WasEmptyLastInterval)
                         toDelete.Add(room.Key);

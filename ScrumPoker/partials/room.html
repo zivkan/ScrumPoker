@@ -1,13 +1,7 @@
-﻿<div ng-show="server.currentRoom == null" class="panel panel-default">
-    <div class="panel-heading">Door to room</div>
-    <div class="panel-body">
-        Name <input type="text" ng-model="myName" /><br />
-        <input type="button" value="Join" ng-click="JoinRoom(roomId, myName)" />
-    </div>
-</div>
+﻿<div ng-show="server.current"><img src="..\ajax-loader.gif"/></div>
 <div ng-show="server.currentRoom != null">
-    <div>
-        <div>
+    <div class="row">
+        <div class="col-sm-6">
             MyBet = {{myBet}}<br />
             <div class="btn-group">
                 <label class="btn btn-primary">
@@ -18,22 +12,18 @@
                 </label>
             </div>
         </div>
-        <div class="panel panel-default">
-            <div class="panel-heading">Participants</div>
-            <div class="panel-body">
-                <div ng-repeat="p in server.currentRoom.participants.Participants" class="participant" style="position: relative; padding: 5px;">
-                    <div class="bet">
-                        <div ng-show="p.Bet != null">{{p.Bet}}</div>
-                        <div ng-show="p.Bet == null && p.HasBet">...</div>
-                    </div>
-                    <div class="name">
-                        <p style="text-align: center;">{{p.Name}}</p>
-                    </div>
+        <div class="col-sm-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">Participants</div>
+                <div class="panel-body">
+                    <ul class="list-group">
+                        <li ng-repeat="v in server.currentRoom.Voters" class="list-group-item">{{v.Name}}<span class="badge">{{v.Bet}}</span></li>
+                    </ul>
                 </div>
-            </div>
-            <div>
-                <div>Majority = {{server.currentRoom.participants.MajorityVote}}</div>
-                <div>Average = {{server.currentRoom.participants.Average}}</div>
+                <div>
+                    <div>Majority = {{server.currentRoom.participants.MajorityVote}}</div>
+                    <div>Average = {{server.currentRoom.participants.Average}}</div>
+                </div>
             </div>
         </div>
     </div>

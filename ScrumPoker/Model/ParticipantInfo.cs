@@ -7,10 +7,10 @@
 
         public bool HasBet { get; private set; }
 
-        public ParticipantInfo(Participant participant)
+        public ParticipantInfo(Voter voter)
         {
-            Name = participant.Name;
-            Bet = participant.Bet;
+            Name = voter.Name;
+            Bet = voter.Bet;
             HasBet = Bet != null;
         }
     }

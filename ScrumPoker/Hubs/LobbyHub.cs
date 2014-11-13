@@ -25,11 +25,10 @@ namespace ScrumPoker.Hubs
             if (room == null)
                 return result;
 
-            var participant = new Participant(Context.ConnectionId, userName);
-            room.Participants.Add(participant);
+            var participant = new Voter(Context.ConnectionId, userName);
+            room.Voters.Add(participant);
             _lobby.ConnectedUsersRoom.Add(Context.ConnectionId, room.Id);
-            result.Participants = RoomHub.GetParticipantInfo(room);
-
+            result.Participants = room.GetParticipantInfo();
 
             result.RoomId = room.Id;
 

@@ -423,7 +423,9 @@
     <Compile Include="Model\Lobby.cs" />
     <Compile Include="Hubs\LobbyHub.cs" />
     <Compile Include="Model\ParticipantInfo.cs" />
-    <Compile Include="Model\Participant.cs" />
+    <Compile Include="Model\RoomExtensions.cs" />
+    <Compile Include="Model\RoomInfoDetailed.cs" />
+    <Compile Include="Model\Voter.cs" />
     <Compile Include="Model\Room.cs" />
     <Compile Include="Hubs\RoomHub.cs" />
     <Compile Include="Model\RoomInfo.cs" />

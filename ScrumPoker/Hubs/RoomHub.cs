@@ -15,16 +15,13 @@ namespace ScrumPoker.Hubs
             _lobby = lobby;
         }
 
-        public RoomVotes JoinRoom(ushort roomId, string displayName)
+        public RoomInfoDetailed JoinRoom(ushort roomId)
         {
-            var participant = new Participant(Context.ConnectionId, displayName);
             var room = _lobby.Rooms[roomId];
-            room.Participants.Add(participant);
             _lobby.ConnectedUsersRoom.Add(Context.ConnectionId, roomId);
+            room.Viewers.Add(Context.ConnectionId);
 
-            SendMessage(string.Format("User '{0}' has joined", displayName));
-
-            return new RoomVotes(GetParticipantInfo(room));
+            return new RoomInfoDetailed(room);
         }
 
         public void LeaveRoom()
@@ -39,10 +36,15 @@ namespace ScrumPoker.Hubs
             if (roomId != null)
             {
                 var room = _lobby.Rooms[roomId.Value];
-                var participant = room.Participants.FirstOrDefault(x => x.ConnectionId == Context.ConnectionId);
+                var participant = room.Voters.FirstOrDefault(x => x.ConnectionId == Context.ConnectionId);
                 if (participant != null)
                 {
-                    room.Participants.Remove(participant);
+                    room.Voters.Remove(participant);
+                    SendRoomUpdate(room);
+                }
+                if (room.Viewers.Contains(Context.ConnectionId))
+                {
+                    room.Viewers.Remove(Context.ConnectionId);
                     SendRoomUpdate(room);
                 }
             }
@@ -56,50 +58,23 @@ namespace ScrumPoker.Hubs
             return base.OnDisconnected();
         }
 
-        public void SendMessage(string message)
-        {
-            var roomId = _lobby.ConnectedUsersRoom[Context.ConnectionId];
-
-            SendRoomUpdate(_lobby.Rooms[roomId]);
-        }
-
         private void SendRoomUpdate(Room room)
         {
-            var participants = new RoomVotes(GetParticipantInfo(room));
+            var participants = new RoomVotes(room.GetParticipantInfo());
 
-            foreach (var p in room.Participants)
+            var connections = room.Voters.Select(v => v.ConnectionId).Concat(room.Viewers);
+
+            foreach (var c in connections)
             {
-                Clients.Client(p.ConnectionId).roomUpdate(participants);
+                Clients.Client(c).roomUpdate(participants);
             }
-        }
-
-        internal static List<ParticipantInfo> GetParticipantInfo(Room room)
-        {
-            var participants = new List<ParticipantInfo>();
-            var everyoneBet = true;
-            foreach (var p in room.Participants)
-            {
-                participants.Add(new ParticipantInfo(p));
-                if (p.Bet == null)
-                    everyoneBet = false;
-            }
-
-            if (!everyoneBet)
-            {
-                foreach (var p in participants)
-                {
-                    p.Bet = null;
-                }
-            }
-
-            return participants;
         }
 
         public void Bet(string value)
         {
             var roomId = _lobby.ConnectedUsersRoom[Context.ConnectionId];
             var room = _lobby.Rooms[roomId];
-            var me = room.Participants.Single(p => p.ConnectionId == Context.ConnectionId);
+            var me = room.Voters.Single(p => p.ConnectionId == Context.ConnectionId);
             me.Bet = value;
 
             SendRoomUpdate(room);
