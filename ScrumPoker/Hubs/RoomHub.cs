@@ -1,8 +1,7 @@
-﻿using Microsoft.AspNet.SignalR;
-using ScrumPoker.Model;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNet.SignalR;
+using ScrumPoker.Model;
 
 namespace ScrumPoker.Hubs
 {
@@ -51,6 +50,8 @@ namespace ScrumPoker.Hubs
                     voter = new Voter(Context.ConnectionId, name);
                     room.Voters.Add(voter);
                 }
+
+                SendRoomUpdate(room);
                 return true;
             }
             return false;

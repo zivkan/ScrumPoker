@@ -214,6 +214,10 @@
                 server.Bet(value);
             };
 
+            $scope.setName = function(name) {
+                server.ChangeParticipation(name);
+            }
+
         }
     ]);
 
