@@ -24,6 +24,38 @@ namespace ScrumPoker.Hubs
             return new RoomInfoDetailed(room);
         }
 
+        /// <summary>
+        /// Change participation type (voter/viewer) in current room
+        /// </summary>
+        /// <param name="name">null if viewer access desired. Otherwise, user name in room.</param>
+        /// <returns></returns>
+        public bool ChangeParticipation(string name)
+        {
+            ushort roomId = 123;
+            if (_lobby.ConnectedUsersRoom.TryGetValue(Context.ConnectionId, out roomId))
+            {
+                var room = _lobby.Rooms[roomId];
+
+                if (room.Viewers.Contains(Context.ConnectionId))
+                    room.Viewers.Remove(Context.ConnectionId);
+                var voter = room.Voters.FirstOrDefault(v => v.ConnectionId == Context.ConnectionId);
+                if (voter != null)
+                    room.Voters.Remove(voter);
+
+                if (name == null)
+                {
+                    room.Viewers.Add(Context.ConnectionId);
+                }
+                else
+                {
+                    voter = new Voter(Context.ConnectionId, name);
+                    room.Voters.Add(voter);
+                }
+                return true;
+            }
+            return false;
+        }
+
         public void LeaveRoom()
         {
             ushort? roomId = null;

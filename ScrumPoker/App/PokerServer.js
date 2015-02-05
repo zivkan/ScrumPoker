@@ -43,6 +43,10 @@
                 return $q.when(room.server.joinRoom(roomId));
             };
 
+            PokerServer.ChangeParticipation = function(username) {
+                return $q.when(room.server.changeParticipation(username));
+            };
+
             PokerServer.LeaveRoom = function() {
                 return $q.when(room.server.leaveRoom());
             };
