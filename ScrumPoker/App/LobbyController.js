@@ -11,23 +11,11 @@
                 });
             });
 
-            var goToRoom = function(roomId, roomName, userName, participants) {
-                server.currentRoom = { id: roomId, name: roomName, username: userName };
-                server.currentRoom.participants = participants;
-                $location.path('/room/' + roomId);
-            };
-
-            $scope.CreateRoom = function(roomName, userName) {
-                server.CreateRoom(roomName, userName).then(function(result) {
-                    if (result.RoomId !== null) {
-                        goToRoom(result.RoomId, roomName, userName, result.participants);
+            $scope.CreateRoom = function(roomName) {
+                server.CreateRoom(roomName).then(function(roomId) {
+                    if (roomId !== null) {
+                        $location.path('/room/' + roomId);
                     }
-                });
-            };
-
-            $scope.JoinRoom = function (roomId, userName) {
-                server.JoinRoom(roomId, userName).then(function (result) {
-                    goToRoom(roomId, 'unknown', userName, result);
                 });
             };
 

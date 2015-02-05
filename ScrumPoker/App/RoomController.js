@@ -15,7 +15,7 @@
             });
 
             $scope.$on('$destroy', function() {
-                server.leaveRoom();
+                server.LeaveRoom();
             });
 
             $scope.Bet = function(value) {

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNet.SignalR;
+﻿using System;
+using Microsoft.AspNet.SignalR;
 using ScrumPoker.Model;
 using System.Collections.Generic;
 
@@ -18,24 +19,17 @@ namespace ScrumPoker.Hubs
             return _lobby.GetAllPublicRooms();
         }
 
-        public CreateRoomResponse CreateRoom(string roomName, string userName)
+        public ushort CreateRoom(string roomName)
         {
             Room room;
-            var result = new CreateRoomResponse {Message = _lobby.CreateRoom(roomName, out room)};
+            var message = _lobby.CreateRoom(roomName, out room);
             if (room == null)
-                return result;
-
-            var participant = new Voter(Context.ConnectionId, userName);
-            room.Voters.Add(participant);
-            _lobby.ConnectedUsersRoom.Add(Context.ConnectionId, room.Id);
-            result.Participants = room.GetParticipantInfo();
-
-            result.RoomId = room.Id;
+                throw new Exception(message);
 
             var roomInfo = new RoomInfo(room);
             Clients.All.RoomAdded(roomInfo);
 
-            return result;
+            return room.Id;
         }
     }
 }

@@ -35,8 +35,8 @@
                 }
             };
 
-            PokerServer.CreateRoom = function (roomName, userName) {
-                return $q.when(lobby.server.createRoom(roomName, userName));
+            PokerServer.CreateRoom = function(roomName) {
+                return $q.when(lobby.server.createRoom(roomName));
             };
 
             PokerServer.JoinRoom = function(roomId) {
@@ -44,7 +44,7 @@
             };
 
             PokerServer.LeaveRoom = function() {
-                return $q.when(room.server.LeaveRoom());
+                return $q.when(room.server.leaveRoom());
             };
 
             PokerServer.Bet = function(amount) {
