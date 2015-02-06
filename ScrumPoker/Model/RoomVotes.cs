@@ -68,7 +68,7 @@ namespace ScrumPoker.Model
 
         private bool EveryoneHasVoted
         {
-            get { return Participants.All(p => p.HasBet); }
+            get { return Participants.Count > 0 && Participants.All(p => p.HasBet); }
         }
 
     }

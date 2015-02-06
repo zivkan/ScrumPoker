@@ -31,6 +31,8 @@
             room.client.roomUpdate = function(participants) {
                 if (PokerServer.currentRoom !== null) {
                     PokerServer.currentRoom.Voters = participants.Participants;
+                    PokerServer.currentRoom.average = participants.Average;
+                    PokerServer.currentRoom.majority = participants.MajorityVote;
                     $rootScope.$apply();
                 }
             };

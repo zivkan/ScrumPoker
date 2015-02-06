@@ -137,6 +137,8 @@
             room.client.roomUpdate = function(participants) {
                 if (PokerServer.currentRoom !== null) {
                     PokerServer.currentRoom.Voters = participants.Participants;
+                    PokerServer.currentRoom.average = participants.Average;
+                    PokerServer.currentRoom.majority = participants.MajorityVote;
                     $rootScope.$apply();
                 }
             };
@@ -195,6 +197,7 @@
         '$scope', 'PokerServer', '$routeParams', function($scope, server, $routeParams) {
             $scope.server = server;
             $scope.roomId = $routeParams.roomId;
+            $scope.participation = "viewer";
 
             $scope.allowedBets = [0, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89];
 
@@ -215,7 +218,15 @@
             };
 
             $scope.setName = function(name) {
-                server.ChangeParticipation(name);
+                $scope.participation = 'changing';
+                server.ChangeParticipation(name).then(
+                    function() {
+                        $scope.serverName = name;
+                        $scope.participation = (name === null) ? "viewer" : "voter";
+                    },
+                    function() {
+                        $scope.participation = (name === null) ? "viewer" : "voter";
+                    });
             }
 
         }

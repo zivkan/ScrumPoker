@@ -1,32 +1,52 @@
 ﻿<div ng-show="server.currentRoom == null"><img src="..\ajax-loader.gif"/></div>
 <div ng-show="server.currentRoom != null">
     <div class="row">
-        <div class="col-sm-6">
-            <div>
-                <input type="text" ng-model="myName"/>
-                <button ng-click="setName(myName)">Set Name</button>
+        <div class="col-sm-12">
+            <h1 class="text-center">{{server.currentRoom.Name}} <small><a href="#">Back to lobby</a></small></h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">Name</div>
+                <div class="panel-body">
+                    <input type="text" ng-model="myName" required="" ng-show="participation==='viewer'"/>
+                    <label ng-show="participation!=='viewer'">{{myName}}</label>
+                    <button ng-click="setName(myName)" ng-show="participation==='viewer'">Join as voter</button>
+                    <button ng-click="setName(null)" ng-show="participation==='voter'">Become viewer</button>
+                </div>
             </div>
-            MyBet = {{myBet}}<br/>
-            <div class="btn-group">
-                <label class="btn btn-primary">
-                    <input type="radio" name="bet" ng-model="myBet" value="-" id="nobet" ng-change="Bet(myBet)"/>No bet
-                </label>
-                <label class="btn btn-primary" ng-repeat="bet in allowedBets">
-                    <input type="radio" name="bet" ng-model="$parent.myBet" value="{{bet}}" id="bet-{{$index}}" ng-change="Bet(myBet)"/>{{bet}}
-                </label>
+            <div class="panel panel-default">
+                <div class="panel-heading">Bet</div>
+                <div class="panel-body">
+                    MyBet = {{myBet}}<br/>
+                    <div class="btn-group">
+                        <label class="btn btn-primary active" ng-model="myBet" btn-radio="null" ng-change="Bet(myBet)">No bet</label>
+                        <label class="btn btn-primary" ng-repeat="bet in allowedBets" ng-model="$parent.myBet" btn-radio="{{bet}}" ng-change="Bet(myBet)">{{bet}}
+                        </label>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="col-sm-4">
             <div class="panel panel-default">
-                <div class="panel-heading">Participants</div>
+                <div class="panel-heading">Voter</div>
                 <div class="panel-body">
                     <ul class="list-group">
-                        <li ng-repeat="v in server.currentRoom.Voters" class="list-group-item">{{v.Name}}<span class="badge">{{v.Bet}}</span></li>
+                        <li ng-repeat="v in server.currentRoom.Voters" class="list-group-item" ng-class="v.HasBet ? 'list-group-item-info': 'list-group-item-warning'">
+                            {{v.Name}}
+                            <span class="badge">{{v.Bet}}</span>
+                        </li>
                     </ul>
                 </div>
-                <div>
-                    <div>Majority = {{server.currentRoom.participants.MajorityVote}}</div>
-                    <div>Average = {{server.currentRoom.participants.Average}}</div>
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">Results</div>
+                <div class="panel-body">
+                    <div>Majority = {{server.currentRoom.majority}}</div>
+                    <div>Average = {{server.currentRoom.average}}</div>
                 </div>
             </div>
         </div>
