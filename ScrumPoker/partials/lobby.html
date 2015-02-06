@@ -2,9 +2,8 @@
     <div class="panel panel-default">
         <div class="panel-heading">Create a room</div>
         <div class="panel-body">
-            <form ng-submit="CreateRoom(newRoomName, displayName)">
+            <form ng-submit="CreateRoom(newRoomName)">
                 Room name: <input type="text" ng-model="newRoomName" /><br />
-                Your name: <input type="text" ng-model="displayName" /><br />
                 <input type="submit" value="Create room" />
             </form>
         </div>
@@ -16,20 +15,24 @@
         <div class="panel-heading">Available rooms</div>
         <div class="panel-body">
             <div ng-show="rooms == null"><img src="..\ajax-loader.gif" /></div>
-            <accordion close-others="true" ng-show="rooms != null">
-                <accordion-group ng-repeat="room in rooms" is-open="isopen">
-                    <accordion-heading>
-                        <i class="glyphicon" ng-class="{true:'glyphicon-chevron-down', false:'glyphicon-chevron-right'}[isopen]"></i>
-                        {{room.Name}}
-                    </accordion-heading>
-                    <div>
-                        <form ng-submit="JoinRoom(room.Id, displayName)">
-                            Your name: <input type="text" ng-model="displayName" /><br />
-                            <input type="submit" value="Join room" />
-                        </form>
-                    </div>
-                </accordion-group>
-            </accordion>
+            <div ng-show="rooms != null">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Room</th>
+                            <th>Voters</th>
+                            <th>Viewers</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="room in rooms">
+                            <td><a href="#/room/{{room.Id}}">{{room.Name}}</a></td>
+                            <td>{{room.Voters}}</td>
+                            <td>{{room.Viewers}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>

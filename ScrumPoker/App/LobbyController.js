@@ -11,23 +11,11 @@
                 });
             });
 
-            var goToRoom = function(roomId, roomName, userName, participants) {
-                server.currentRoom = { id: roomId, name: roomName, username: userName };
-                server.currentRoom.participants = participants;
-                $location.path('/room/' + roomId);
-            };
-
-            $scope.CreateRoom = function(roomName, userName) {
-                server.CreateRoom(roomName, userName).then(function(result) {
-                    if (result.RoomId !== null) {
-                        goToRoom(result.RoomId, roomName, userName, result.participants);
+            $scope.CreateRoom = function(roomName) {
+                server.CreateRoom(roomName).then(function(roomId) {
+                    if (roomId !== null) {
+                        $location.path('/room/' + roomId);
                     }
-                });
-            };
-
-            $scope.JoinRoom = function (roomId, userName) {
-                server.JoinRoom(roomId, userName).then(function (result) {
-                    goToRoom(roomId, 'unknown', userName, result);
                 });
             };
 
@@ -44,6 +32,18 @@
                 for (var i = 0; i < $scope.rooms.length; i++) {
                     if ($scope.rooms[i].Id === roomId) {
                         $scope.$apply(removeRoom(i));
+                        break;
+                    }
+                }
+            });
+
+            server.$on('roomUpdated', function(event, room) {
+                for (var i = 0; i < $scope.rooms.length; i++) {
+                    if ($scope.rooms[i].Id === room.Id) {
+                        $scope.$apply(function() {
+                            $scope.rooms[i].Voters = room.Voters;
+                            $scope.rooms[i].Viewers = room.Viewers;
+                        });
                         break;
                     }
                 }

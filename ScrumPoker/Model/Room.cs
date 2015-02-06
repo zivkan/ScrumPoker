@@ -8,7 +8,9 @@ namespace ScrumPoker.Model
         public ushort Id { get; private set; }
         public string Name { get; private set; }
 
-        public IList<Participant> Participants { get; private set; }
+        public IList<Voter> Voters { get; private set; }
+
+        public IList<string> Viewers { get; private set; } 
 
         public bool WasEmptyLastInterval { get; set; }
 
@@ -16,7 +18,8 @@ namespace ScrumPoker.Model
         {
             Id = id;
             Name = name;
-            Participants = new List<Participant>();
+            Voters = new List<Voter>();
+            Viewers = new List<string>();
             WasEmptyLastInterval = false;
         }
     }

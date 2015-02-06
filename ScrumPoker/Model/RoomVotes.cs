@@ -8,12 +8,14 @@ namespace ScrumPoker.Model
     public class RoomVotes
     {
 
-        public RoomVotes(IEnumerable<ParticipantInfo> participants)
+        public RoomVotes(IEnumerable<ParticipantInfo> participants, int viewers)
         {
             Participants = participants.ToList();
+            Viewers = viewers;
         }
 
         public IList<ParticipantInfo> Participants { get; private set; }
+        public int Viewers { get; private set; }
 
         public string MajorityVote
         {
@@ -68,7 +70,7 @@ namespace ScrumPoker.Model
 
         private bool EveryoneHasVoted
         {
-            get { return Participants.All(p => p.HasBet); }
+            get { return Participants.Count > 0 && Participants.All(p => p.HasBet); }
         }
 
     }
