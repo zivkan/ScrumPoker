@@ -10,10 +10,10 @@ namespace ScrumPoker.Model
     public class Lobby
     {
         public IDictionary<ushort, Room> Rooms { get; private set; }
-        public IDictionary<string, ushort> ConnectedUsersRoom { get; private set; } 
+        public IDictionary<string, ushort> ConnectedUsersRoom { get; private set; }
+        public IHubContext Hub { get; private set; }
         private readonly Random _rand;
         private readonly Timer _timer;
-        private readonly IHubContext _hub;
 
         public Lobby(IHubContext hub)
         {
@@ -22,7 +22,7 @@ namespace ScrumPoker.Model
             _rand = new Random();
             _timer = new Timer(30*1000) {Enabled = false, AutoReset = true};
             _timer.Elapsed += TimerOnElapsed;
-            _hub = hub;
+            Hub = hub;
         }
 
         private void TimerOnElapsed(object sender, ElapsedEventArgs elapsedEventArgs)
@@ -47,7 +47,7 @@ namespace ScrumPoker.Model
             foreach (var roomId in toDelete)
             {
                 Rooms.Remove(roomId);
-                _hub.Clients.All.roomDeleted(roomId);
+                Hub.Clients.All.roomDeleted(roomId);
             }
 
             if (Rooms.Count == 0)

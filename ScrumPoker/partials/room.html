@@ -1,8 +1,9 @@
-﻿<div ng-show="server.currentRoom == null"><img src="..\ajax-loader.gif"/></div>
+﻿<div ng-show="server.currentRoom == null"><img src="..\ajax-loader.gif" /></div>
 <div ng-show="server.currentRoom != null">
     <div class="row">
-        <div class="col-sm-12">
-            <h1 class="text-center">{{server.currentRoom.Name}} <small><a href="#">Back to lobby</a></small></h1>
+        <div class="col-sm-12 text-center">
+            <h1 class="text-center">{{server.currentRoom.Name}}</h1>
+            <div>{{server.currentRoom.Voters.length}} voters. {{server.currentRoom.Viewers}} viewers. <a href="#">Back to lobby</a></div>
         </div>
     </div>
     <div class="row">
@@ -10,7 +11,7 @@
             <div class="panel panel-default">
                 <div class="panel-heading">Name</div>
                 <div class="panel-body">
-                    <input type="text" ng-model="myName" required="" ng-show="participation==='viewer'"/>
+                    <input type="text" ng-model="myName" required="" ng-show="participation==='viewer'" />
                     <label ng-show="participation!=='viewer'">{{myName}}</label>
                     <button ng-click="setName(myName)" ng-show="participation==='viewer'">Join as voter</button>
                     <button ng-click="setName(null)" ng-show="participation==='voter'">Become viewer</button>
@@ -19,10 +20,11 @@
             <div class="panel panel-default">
                 <div class="panel-heading">Bet</div>
                 <div class="panel-body">
-                    MyBet = {{myBet}}<br/>
+                    MyBet = {{myBet}}<br />
                     <div class="btn-group">
                         <label class="btn btn-primary active" ng-model="myBet" btn-radio="null" ng-change="Bet(myBet)">No bet</label>
-                        <label class="btn btn-primary" ng-repeat="bet in allowedBets" ng-model="$parent.myBet" btn-radio="{{bet}}" ng-change="Bet(myBet)">{{bet}}
+                        <label class="btn btn-primary" ng-repeat="bet in allowedBets" ng-model="$parent.myBet" btn-radio="{{bet}}" ng-change="Bet(myBet)">
+                            {{bet}}
                         </label>
                     </div>
                 </div>

@@ -98,6 +98,18 @@
                 }
             });
 
+            server.$on('roomUpdated', function(event, room) {
+                for (var i = 0; i < $scope.rooms.length; i++) {
+                    if ($scope.rooms[i].Id === room.Id) {
+                        $scope.$apply(function() {
+                            $scope.rooms[i].Voters = room.Voters;
+                            $scope.rooms[i].Viewers = room.Viewers;
+                        });
+                        break;
+                    }
+                }
+            });
+
         }
     ]);
 
@@ -130,6 +142,10 @@
                 PokerServer.$emit('roomDeleted', roomId);
             };
 
+            lobby.client.roomChanged = function(room) {
+                PokerServer.$emit('roomUpdated', room);
+            }
+
             // room methods & events
             PokerServer.currentRoom = null;
             var room = $.connection.roomHub;
@@ -137,6 +153,7 @@
             room.client.roomUpdate = function(participants) {
                 if (PokerServer.currentRoom !== null) {
                     PokerServer.currentRoom.Voters = participants.Participants;
+                    PokerServer.currentRoom.Viewers = participants.Viewers;
                     PokerServer.currentRoom.average = participants.Average;
                     PokerServer.currentRoom.majority = participants.MajorityVote;
                     $rootScope.$apply();

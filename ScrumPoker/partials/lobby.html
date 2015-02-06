@@ -27,6 +27,8 @@
                     <tbody>
                         <tr ng-repeat="room in rooms">
                             <td><a href="#/room/{{room.Id}}">{{room.Name}}</a></td>
+                            <td>{{room.Voters}}</td>
+                            <td>{{room.Viewers}}</td>
                         </tr>
                     </tbody>
                 </table>

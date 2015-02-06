@@ -37,6 +37,18 @@
                 }
             });
 
+            server.$on('roomUpdated', function(event, room) {
+                for (var i = 0; i < $scope.rooms.length; i++) {
+                    if ($scope.rooms[i].Id === room.Id) {
+                        $scope.$apply(function() {
+                            $scope.rooms[i].Voters = room.Voters;
+                            $scope.rooms[i].Viewers = room.Viewers;
+                        });
+                        break;
+                    }
+                }
+            });
+
         }
     ]);
 

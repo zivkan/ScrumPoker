@@ -19,7 +19,8 @@ namespace ScrumPoker.Hubs
             var room = _lobby.Rooms[roomId];
             _lobby.ConnectedUsersRoom.Add(Context.ConnectionId, roomId);
             room.Viewers.Add(Context.ConnectionId);
-
+            _lobby.Hub.Clients.All.RoomChanged(new RoomInfo(room));
+            SendRoomUpdate(room);
             return new RoomInfoDetailed(room);
         }
 
@@ -52,6 +53,7 @@ namespace ScrumPoker.Hubs
                 }
 
                 SendRoomUpdate(room);
+                _lobby.Hub.Clients.All.RoomChanged(new RoomInfo(room));
                 return true;
             }
             return false;
@@ -74,11 +76,13 @@ namespace ScrumPoker.Hubs
                 {
                     room.Voters.Remove(participant);
                     SendRoomUpdate(room);
+                    _lobby.Hub.Clients.All.RoomUpdate(new RoomInfo(room));
                 }
                 if (room.Viewers.Contains(Context.ConnectionId))
                 {
                     room.Viewers.Remove(Context.ConnectionId);
                     SendRoomUpdate(room);
+                    _lobby.Hub.Clients.All.RoomUpdate(new RoomInfo(room));
                 }
             }
 
@@ -93,7 +97,7 @@ namespace ScrumPoker.Hubs
 
         private void SendRoomUpdate(Room room)
         {
-            var participants = new RoomVotes(room.GetParticipantInfo());
+            var participants = new RoomVotes(room.GetParticipantInfo(), room.Viewers.Count);
 
             var connections = room.Voters.Select(v => v.ConnectionId).Concat(room.Viewers);
 

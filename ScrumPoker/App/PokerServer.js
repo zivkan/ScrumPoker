@@ -24,6 +24,10 @@
                 PokerServer.$emit('roomDeleted', roomId);
             };
 
+            lobby.client.roomChanged = function(room) {
+                PokerServer.$emit('roomUpdated', room);
+            }
+
             // room methods & events
             PokerServer.currentRoom = null;
             var room = $.connection.roomHub;
@@ -31,6 +35,7 @@
             room.client.roomUpdate = function(participants) {
                 if (PokerServer.currentRoom !== null) {
                     PokerServer.currentRoom.Voters = participants.Participants;
+                    PokerServer.currentRoom.Viewers = participants.Viewers;
                     PokerServer.currentRoom.average = participants.Average;
                     PokerServer.currentRoom.majority = participants.MajorityVote;
                     $rootScope.$apply();
