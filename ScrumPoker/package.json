@@ -1,0 +1,24 @@
+{
+  "name": "ScrumPoker",
+  "version": "1.0.0",
+  "description": "Agile Scrum poker estimation app",
+  "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {
+    "gulp": "^3.8.10",
+    "gulp-concat": "^2.4.3"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zivkan/ScrumPoker"
+  },
+  "author": "Andy Zivkovic",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/zivkan/ScrumPoker/issues"
+  },
+  "homepage": "https://github.com/zivkan/ScrumPoker"
+}

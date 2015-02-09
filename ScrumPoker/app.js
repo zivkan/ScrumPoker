@@ -1,4 +1,3 @@
-﻿///#source 1 1 /App/AppModule.js
 (function() {
     'use strict';
 
@@ -19,13 +18,11 @@
     ]);
 })();
 
-///#source 1 1 /App/ControllerModule.js
 (function () {
     'use strict';
     angular.module('scrumPokerControllers', []);
 })();
 
-///#source 1 1 /App/ConnectionController.js
 (function() {
     'use strict';
 
@@ -58,7 +55,6 @@
 
 })();
 
-///#source 1 1 /App/LobbyController.js
 (function () {
     'use strict';
 
@@ -115,7 +111,6 @@
 
 })();
 
-///#source 1 1 /App/PokerServer.js
 (function() {
     'use strict';
     angular.module('scrumPokerApp').factory('PokerServer', [
@@ -206,7 +201,6 @@
     ]);
 })();
 
-///#source 1 1 /App/RoomController.js
 (function() {
     'use strict';
 
@@ -250,4 +244,3 @@
     ]);
 
 })();
-
