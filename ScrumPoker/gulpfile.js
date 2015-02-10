@@ -5,7 +5,7 @@ var minHtml = require("gulp-minify-html");
 var sourcemap = require("gulp-sourcemaps");
 var uglify = require("gulp-uglify");
 
-gulp.task("script", function() {
+gulp.task("scripts", function() {
     gulp.src([
             "App/app.module.js",
             "App/**/*.module.js",
@@ -24,3 +24,5 @@ gulp.task("templates", function() {
         .pipe(templateCache("templates.js", { standalone: true, root:"partials" }))
         .pipe(gulp.dest("."));
 });
+
+gulp.task("build", ["scripts", "templates"]);
