@@ -88,15 +88,10 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="ajax-loader.gif" />
-    <Content Include="App\App.js">
-      <DependentUpon>App.js.bundle</DependentUpon>
-    </Content>
-    <Content Include="App\App.min.js">
-      <DependentUpon>App.js</DependentUpon>
-    </Content>
-    <Content Include="App\AppModule.js" />
+    <Content Include="app.js" />
+    <Content Include="App\app.module.js" />
     <Content Include="App\ConnectionController.js" />
-    <Content Include="App\ControllerModule.js" />
+    <Content Include="App\controller.module.js" />
     <Content Include="App\LobbyController.js" />
     <Content Include="App\PokerServer.js" />
     <Content Include="App\RoomController.js" />
@@ -105,17 +100,15 @@
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
+    <None Include="gulpfile.js" />
     <Content Include="index.html" />
-    <Content Include="packages.config" />
+    <None Include="packages.config" />
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
     <Content Include="fonts\glyphicons-halflings-regular.ttf" />
     <Content Include="fonts\glyphicons-halflings-regular.eot" />
     <Content Include="Content\bootstrap-theme.css.map" />
     <Content Include="Content\bootstrap.css.map" />
-    <Content Include="App\App.js.bundle" />
-    <Content Include="App\App.min.js.map">
-      <DependentUpon>App.min.js</DependentUpon>
-    </Content>
+    <None Include="package.json" />
     <None Include="Scripts\jquery-1.11.0.intellisense.js" />
     <Content Include="partials\connection.html" />
     <Content Include="Scripts\bootstrap.js" />
@@ -415,6 +408,7 @@
     <Content Include="Scripts\ui-bootstrap-tpls-0.10.0.js" />
     <Content Include="Scripts\ui-bootstrap-tpls-0.10.0.min.js" />
     <Content Include="Style\scrum.css" />
+    <Content Include="templates.js" />
     <Content Include="Web.config" />
     <Content Include="Scripts\version.json" />
   </ItemGroup>
