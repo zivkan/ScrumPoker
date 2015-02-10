@@ -7,12 +7,9 @@ var uglify = require("gulp-uglify");
 
 gulp.task("script", function() {
     gulp.src([
-            "App/AppModule.js",
-            "App/ControllerModule.js",
-            "App/ConnectionController.js",
-            "App/LobbyController.js",
-            "App/PokerServer.js",
-            "App/RoomController.js"
+            "App/app.module.js",
+            "App/**/*.module.js",
+            "App/**/*.js"
     ])
         .pipe(sourcemap.init())
             .pipe(concat("app.js"))

@@ -89,9 +89,9 @@
   <ItemGroup>
     <Content Include="ajax-loader.gif" />
     <Content Include="app.js" />
-    <Content Include="App\AppModule.js" />
+    <Content Include="App\app.module.js" />
     <Content Include="App\ConnectionController.js" />
-    <Content Include="App\ControllerModule.js" />
+    <Content Include="App\controller.module.js" />
     <Content Include="App\LobbyController.js" />
     <Content Include="App\PokerServer.js" />
     <Content Include="App\RoomController.js" />
