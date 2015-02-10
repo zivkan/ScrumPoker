@@ -1,4 +1,4 @@
 ﻿(function () {
     'use strict';
-    angular.module('scrumPokerControllers', []);
+    angular.module('scrumPokerControllers', ['templates']);
 })();

@@ -1,7 +1,7 @@
 ﻿(function() {
     'use strict';
 
-    var scrumPokerApp = angular.module('scrumPokerApp', ['ngRoute', 'ui.bootstrap', 'scrumPokerControllers']);
+    var scrumPokerApp = angular.module('scrumPokerApp', ['ngRoute', 'ui.bootstrap', 'scrumPokerControllers', 'templates']);
 
     scrumPokerApp.config([
         '$routeProvider', function($routeProvider) {
