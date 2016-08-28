@@ -5,6 +5,8 @@
 *.suo
 *.user
 *.sln.docstates
+.vs/
+*.lock.json
 
 # Build results
 
@@ -94,6 +96,7 @@ publish/
 
 # Publish Web Output
 *.Publish.xml
+wwwroot/
 
 # NuGet Packages Directory
 ## TODO: If you have NuGet Package Restore enabled, uncomment the next line
