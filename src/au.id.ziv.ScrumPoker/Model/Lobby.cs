@@ -1,3 +1,4 @@
+using au.id.ziv.ScrumPoker.Hubs;
 using Microsoft.AspNetCore.SignalR;
 using System;
 using System.Collections.Concurrent;
@@ -11,11 +12,11 @@ namespace au.id.ziv.ScrumPoker.Model
     {
         public IDictionary<ushort, Room> Rooms { get; private set; }
         public IDictionary<string, ushort> ConnectedUsersRoom { get; private set; }
-        public IHubContext Hub { get; private set; }
+        public IHubContext<LobbyHub> Hub { get; private set; }
         private readonly Random _rand;
         private readonly Timer _timer;
 
-        public Lobby(IHubContext hub)
+        public Lobby(IHubContext<LobbyHub> hub)
         {
             Rooms = new ConcurrentDictionary<ushort, Room>();
             ConnectedUsersRoom = new ConcurrentDictionary<string, ushort>();
